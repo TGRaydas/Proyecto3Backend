@@ -31,7 +31,7 @@ class FriendsController < ApplicationController
 	end
 
 	def update_request
-		f = Friend.where(user_receiver_id: params[:user_id], user_sender_id: params[:user_sender])
+		f = Friend.where(user_receiver_id: params[:user_id], user_sender_id: params[:user_sender]).first
 		f.update(state: params[:state])
 	end
 
