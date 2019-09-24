@@ -4,5 +4,5 @@ Rails.application.routes.draw do
   get '/friends_requests', to: "friends#get_requests"
   get '/friends/:user_id', to: "friends#get_friends"
   post '/friends_requests', to: "friends#create_requests"
-
+  get '/search_friends', to: "friends#search_friends"
 end
