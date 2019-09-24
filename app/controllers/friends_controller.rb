@@ -26,7 +26,8 @@ class FriendsController < ApplicationController
 	end
 
 	def create_requests
-		Friend.create(user_sender_id: params[:user_id], user_receiver_id: params[:user_receiver])
+		p = Profile.find_by(nickname: params[:user_sender])
+		Friend.create(user_sender_id: params[:user_id], user_receiver_id: p.user_id)
 		render json: {status: "ok"}
 	end
 
