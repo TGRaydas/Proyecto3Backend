@@ -1,6 +1,6 @@
 class FriendsController < ApplicationController
 	def get_requests
-		friends = Friend.where(user_receiver:params[:user_id])
+		friends = Friend.where(user_receiver_id:params[:user_id])
 		render json: friends
 	end
 
@@ -11,22 +11,22 @@ class FriendsController < ApplicationController
 		friends_2 = Friend.where(user_sender_id:params[:user_id], state:2)
 		pending = Friend.where(user_receiver_id:params[:user_id], state:1)
 		friends_1.each do |f|
-			p = Profile.where(user:f.user_sender_id)
+			p = Profile.find_by(user_id:f.user_sender_id)
 			friends.push(p)
 		end
 		friends_2.each do |f|
-			p = Profile.where(user:f.user_receiver_id)
+			p = Profile.find_by(user_id:f.user_receiver_id)
 			friends.push(p)
 		end
 		pending.each do |f|
-			p = Profile.where(user:f.user_sender_id)
+			p = Profile.find_by(user_id:f.user_sender_id)
 			pending_out.push(p)
 		end
 		render json:{friends:friends, pending:pending_out}
 	end
 
 	def create_requests
-		Friend.create(user_sender: params[:user_id], user_receiver: params[:user_receiver])
+		Friend.create(user_sender_id: params[:user_id], user_receiver_id: params[:user_receiver])
 		render json: {status: "ok"}
 	end
 
