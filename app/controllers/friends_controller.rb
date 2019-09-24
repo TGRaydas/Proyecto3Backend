@@ -1,6 +1,6 @@
 class FriendsController < ApplicationController
 	def get_requests
-		friends = Friend.where(user_receiver:current_user)
+		friends = Friend.where(user_receiver:params[:user_id])
 		render json: friends
 	end
 
@@ -31,7 +31,12 @@ class FriendsController < ApplicationController
 	end
 
 	def create_requests
-		Friend.create(user_sender: current_user, user_receiver:params[:user_receiver])
+		Friend.create(user_sender: params[:user_id], user_receiver: params[:user_receiver])
 		render json: {status: "ok"}
+	end
+
+	def update_request
+		f = Friend.where(user_receiver: params[:user_id], user_sender: params[:user_sender])
+		f.update(state: params[:new_state])
 	end
 end
