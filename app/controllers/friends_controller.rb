@@ -12,21 +12,16 @@ class FriendsController < ApplicationController
 		pending = Friend.where(user_receiver_id:params[:user_id], state:1)
 		friends_1.each do |f|
 			p = Profile.where(user:f.user_sender_id)
-#			p.write_attribute(:state, 2)
 			friends.push(p)
 		end
 		friends_2.each do |f|
 			p = Profile.where(user:f.user_receiver_id)
-#			p.write_attribute(:state, 2)
 			friends.push(p)
 		end
-
 		pending.each do |f|
 			p = Profile.where(user:f.user_sender_id)
-#			p.write_attribute(:state, 1)
 			pending_out.push(p)
 		end
-
 		render json:{friends:friends, pending:pending_out}
 	end
 
@@ -37,6 +32,6 @@ class FriendsController < ApplicationController
 
 	def update_request
 		f = Friend.where(user_receiver: params[:user_id], user_sender: params[:user_sender])
-		f.update(state: params[:new_state])
+		f.update(state: params[:state])
 	end
 end
