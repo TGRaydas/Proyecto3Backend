@@ -12,18 +12,18 @@ class FriendsController < ApplicationController
 		pending = Friend.where(user_receiver_id:params[:user_id], state:1)
 		friends_1.each do |f|
 			p = Profile.where(user:f.user_sender_id)
-			p[:state] = f.state
+#			p.write_attribute(:state, 2)
 			friends.push(p)
 		end
 		friends_2.each do |f|
 			p = Profile.where(user:f.user_receiver_id)
-			p[:state] = f.state
+#			p.write_attribute(:state, 2)
 			friends.push(p)
 		end
 
 		pending.each do |f|
 			p = Profile.where(user:f.user_sender_id)
-			p[:state]= f.state
+#			p.write_attribute(:state, 1)
 			pending_out.push(p)
 		end
 
