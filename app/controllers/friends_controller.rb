@@ -34,4 +34,10 @@ class FriendsController < ApplicationController
 		f = Friend.where(user_receiver: params[:user_id], user_sender: params[:user_sender])
 		f.update(state: params[:state])
 	end
+
+	def search_friends
+		query = params[:query]
+		profiles = Profile.where("nickname LIKE ?", "%#{query}%")
+		render json:{profiles:profiles}
+	end
 end
