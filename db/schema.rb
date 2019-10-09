@@ -10,7 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_09_23_185816) do
+ActiveRecord::Schema.define(version: 2019_10_09_203558) do
+
+  create_table "dices", force: :cascade do |t|
+    t.integer "hand_id"
+    t.integer "suit_id"
+    t.integer "quantity"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["hand_id"], name: "index_dices_on_hand_id"
+    t.index ["suit_id"], name: "index_dices_on_suit_id"
+  end
 
   create_table "friends", force: :cascade do |t|
     t.integer "user_sender_id"
@@ -22,6 +32,29 @@ ActiveRecord::Schema.define(version: 2019_09_23_185816) do
     t.index ["user_sender_id"], name: "index_friends_on_user_sender_id"
   end
 
+  create_table "games", force: :cascade do |t|
+    t.string "name"
+    t.boolean "finished"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "games_rules", id: false, force: :cascade do |t|
+    t.integer "game_id", null: false
+    t.integer "rule_id", null: false
+    t.index ["game_id"], name: "index_games_rules_on_game_id"
+    t.index ["rule_id"], name: "index_games_rules_on_rule_id"
+  end
+
+  create_table "hands", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "round_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["round_id"], name: "index_hands_on_round_id"
+    t.index ["user_id"], name: "index_hands_on_user_id"
+  end
+
   create_table "profiles", force: :cascade do |t|
     t.integer "user_id"
     t.string "nickname"
@@ -29,6 +62,41 @@ ActiveRecord::Schema.define(version: 2019_09_23_185816) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_profiles_on_user_id"
+  end
+
+  create_table "rounds", force: :cascade do |t|
+    t.integer "game_id"
+    t.integer "user_action_id"
+    t.boolean "action"
+    t.boolean "success"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["game_id"], name: "index_rounds_on_game_id"
+    t.index ["user_action_id"], name: "index_rounds_on_user_action_id"
+  end
+
+  create_table "rules", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "suits", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "turns", force: :cascade do |t|
+    t.integer "suit_id"
+    t.integer "rule_id"
+    t.integer "round_id"
+    t.integer "quantity"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["round_id"], name: "index_turns_on_round_id"
+    t.index ["rule_id"], name: "index_turns_on_rule_id"
+    t.index ["suit_id"], name: "index_turns_on_suit_id"
   end
 
   create_table "users", force: :cascade do |t|
