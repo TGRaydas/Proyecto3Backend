@@ -10,12 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_10_134843) do
+ActiveRecord::Schema.define(version: 2019_10_10_152710) do
 
   create_table "dices", force: :cascade do |t|
     t.integer "hand_id"
     t.integer "suit_id"
-    t.integer "quantity"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["hand_id"], name: "index_dices_on_hand_id"
@@ -32,6 +31,15 @@ ActiveRecord::Schema.define(version: 2019_10_10_134843) do
     t.index ["user_sender_id"], name: "index_friends_on_user_sender_id"
   end
 
+  create_table "game_rules", force: :cascade do |t|
+    t.integer "game_id"
+    t.integer "rule_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["game_id"], name: "index_game_rules_on_game_id"
+    t.index ["rule_id"], name: "index_game_rules_on_rule_id"
+  end
+
   create_table "game_users", force: :cascade do |t|
     t.integer "user_id"
     t.integer "game_id"
@@ -39,6 +47,7 @@ ActiveRecord::Schema.define(version: 2019_10_10_134843) do
     t.integer "final_place"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "accepted"
     t.index ["game_id"], name: "index_game_users_on_game_id"
     t.index ["user_id"], name: "index_game_users_on_user_id"
   end
@@ -69,6 +78,7 @@ ActiveRecord::Schema.define(version: 2019_10_10_134843) do
   create_table "profiles", force: :cascade do |t|
     t.integer "user_id"
     t.string "nickname"
+    t.integer "state"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_profiles_on_user_id"
@@ -89,6 +99,7 @@ ActiveRecord::Schema.define(version: 2019_10_10_134843) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "description"
   end
 
   create_table "suits", force: :cascade do |t|
@@ -104,9 +115,11 @@ ActiveRecord::Schema.define(version: 2019_10_10_134843) do
     t.integer "quantity"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "user_id"
     t.index ["round_id"], name: "index_turns_on_round_id"
     t.index ["rule_id"], name: "index_turns_on_rule_id"
     t.index ["suit_id"], name: "index_turns_on_suit_id"
+    t.index ["user_id"], name: "index_turns_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -117,6 +130,7 @@ ActiveRecord::Schema.define(version: 2019_10_10_134843) do
     t.datetime "remember_created_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "token"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end

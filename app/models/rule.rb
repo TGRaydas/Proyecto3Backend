@@ -1,3 +1,4 @@
 class Rule < ApplicationRecord
-  has_and_belongs_to_many :games
+  has_many :game_rules
+  has_many :rules, through: :game_rules
 end
