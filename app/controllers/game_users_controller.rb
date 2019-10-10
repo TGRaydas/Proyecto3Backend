@@ -16,7 +16,7 @@ class GameUsersController < ApplicationController
   # POST /game_users
   def create
     @game_user = GameUser.new(game_user_params)
-
+    @game_user.accepted = false
     if @game_user.save
       render json: @game_user, status: :created, location: @game_user
     else
@@ -38,14 +38,42 @@ class GameUsersController < ApplicationController
     @game_user.destroy
   end
 
-  private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_game_user
-      @game_user = GameUser.find(params[:id])
-    end
 
-    # Only allow a trusted parameter "white list" through.
-    def game_user_params
-      params.require(:game_user).permit(:user_id, :game_id, :position, :final_place)
+
+  # Use callbacks to share common setup or constraints between actions.
+  def set_game_user
+    @game_user = GameUser.find(params[:id])
+  end
+
+  def my_games
+    @games = User.find(game_user_params[:user_id]).games
+    render json: @games
+  end
+
+  def my_invitations
+    user = User.find(params[:user_id])
+    invitations = user.get_my_invitations
+
+    render json: invitations
+  end
+
+
+  # Only allow a trusted parameter "white list" through.
+
+
+  def accept_game
+    @invitation = GameUser.where(game_id: game_user_params[:game_id], user_id: game_user_params[:user_id])
+    last_user = GameUser.where(game_id: game_user_params[:game_id]).where.not(position: nil).order(position: :desc).first
+    if invitation.update(accepted: true, position:last_user[:position] + 1)
+      render json: @invitation
+    else
+      render json: @invitation.errors, status: :unprocessable_entity
     end
+  end
+
+  private
+  def game_user_params
+    params.permit(:user_id, :game_id)
+  end
+
 end
