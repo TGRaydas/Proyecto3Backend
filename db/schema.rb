@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_09_203558) do
+ActiveRecord::Schema.define(version: 2019_10_10_134843) do
 
   create_table "dices", force: :cascade do |t|
     t.integer "hand_id"
@@ -30,6 +30,17 @@ ActiveRecord::Schema.define(version: 2019_10_09_203558) do
     t.datetime "updated_at", null: false
     t.index ["user_receiver_id"], name: "index_friends_on_user_receiver_id"
     t.index ["user_sender_id"], name: "index_friends_on_user_sender_id"
+  end
+
+  create_table "game_users", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "game_id"
+    t.integer "position"
+    t.integer "final_place"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["game_id"], name: "index_game_users_on_game_id"
+    t.index ["user_id"], name: "index_game_users_on_user_id"
   end
 
   create_table "games", force: :cascade do |t|
