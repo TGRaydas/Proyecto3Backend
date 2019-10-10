@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 class FriendsController < ApplicationController
 	def get_requests
 		friends = Friend.where(user_receiver_id:params[:user_id])
