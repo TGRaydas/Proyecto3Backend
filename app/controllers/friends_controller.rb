@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 class FriendsController < ApplicationController
 	def get_requests
 		friends = Friend.where(user_receiver_id:params[:user_id])
@@ -51,5 +52,11 @@ class FriendsController < ApplicationController
 		query = params[:query]
 		profiles = Profile.where("nickname LIKE ?", "%#{query}%")
 		render json:{profiles:profiles}
+		
 	end
+	def my_friends
+    		user = User.find(params[:user_id])
+    		@friends_by_nickname = user.get_my_friends(params[:query])
+    		render json: @friends_by_nickname
+  	end
 end

@@ -16,7 +16,7 @@ constants = {"game_1": "GAME 1",
                                   Cuando un jugador pasa, le toca al siguiente jugador y este solamente puede seguir juganddo o dudar el paso",
              "description_cambio_as": "En cualquier momento un jugador puede cambiar la cantidad de dados a la mitad más uno de ases.\n Ej: Si tiene 7 cuadras puede decir 4 ases.\n
                                         Si otro jugador desea volver a otra pinta, debe decir duplicar el numero de dados. \n Ej: Si tiene 3 ases puede decir 7 de algo "
-              }
+}
 
 User.create(email: "pgrand@miuandes.cl", password: "password")
 User.create(email: "ijfigueroa@miuandes.cl", password: "password")
@@ -45,8 +45,8 @@ Rule.create(name: "Paso", description: constants["description_paso"])
 Rule.create(name: "Cambio a As", description: constants["description_cambio_as"])
 
 
-Game.create(name: constants["game_1"], finished: true)
-GameRule.create(rule_id: 4, game_id:1)
+Game.create(name: constants["game_1"], finished: false)
+GameRule.create(rule_id: 4, game_id: 1)
 
 GameUser.create(user_id: 1, game_id: 1, position: 1, final_place: nil, accepted: true)
 GameUser.create(user_id: 2, game_id: 1, position: 2, final_place: nil, accepted: true)
