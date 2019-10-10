@@ -18,9 +18,11 @@ class GamesController < ApplicationController
   # POST /games
   def create
     @game = Game.new(name:params[:name])
+    rules = params[:rules]
     if @game.save
-      params[:rules].each do |r|
-        GameRule.create(game_id:@game.id, rule_id:r.id)
+      rules.each do |r|
+	puts r
+        GameRule.create(game_id:@game.id, rule_id:r[:id])
       end
       GameUser.create(user_id: params[:user_id], game_id:@game.id, position: 1, final_place:nil)
       render json: @game, status: :created, location: @game
