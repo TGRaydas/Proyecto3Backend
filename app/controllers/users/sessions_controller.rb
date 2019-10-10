@@ -11,7 +11,12 @@ class Users::SessionsController < Devise::SessionsController
   # POST /resource/sign_in
   def create
     user = User.find_by_email(params[:username])
+    user.update(token: params[:token])
     if user.valid_password?(params[:password])
+      users_with_same_token = User.where(token: params[:token])
+      users_with_same_token.each do |user|
+        user.update(token: nil)
+      end
       sign_in user
       render json:{state: "success", userid: user.id}
       return
