@@ -59,13 +59,6 @@ ActiveRecord::Schema.define(version: 2019_10_10_152710) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "games_rules", id: false, force: :cascade do |t|
-    t.integer "game_id", null: false
-    t.integer "rule_id", null: false
-    t.index ["game_id"], name: "index_games_rules_on_game_id"
-    t.index ["rule_id"], name: "index_games_rules_on_rule_id"
-  end
-
   create_table "hands", force: :cascade do |t|
     t.integer "user_id"
     t.integer "round_id"
