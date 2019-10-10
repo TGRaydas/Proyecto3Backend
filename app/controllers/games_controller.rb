@@ -17,9 +17,9 @@ class GamesController < ApplicationController
 
   # POST /games
   def create
-    @game = Game.new(game_params)
+    @game = Game.new(name:params[:name])
     if @game.save
-      GameUser.create(user_id: game_params, game_id:@game.id, postition: 1, final_place:nil)
+      GameUser.create(user_id: params[:user_id], game_id:@game.id, position: 1, final_place:nil)
       render json: @game, status: :created, location: @game
     else
       render json: @game.errors, status: :unprocessable_entity
