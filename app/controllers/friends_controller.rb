@@ -28,7 +28,8 @@ class FriendsController < ApplicationController
 	def create_request
 		p = Profile.find_by(nickname: params[:user_sender])
 		Friend.create(user_sender_id: params[:user_id], user_receiver_id: p.user_id)
-		render json: {status: "ok"}
+		friend_token = User.find(p.user_id).token
+		render json: {status: "ok", friend_token: friend_token}
 	end
 
 	def update_request

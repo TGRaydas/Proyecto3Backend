@@ -11,7 +11,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   # POST /resource
   def create
-    user = User.create(email: params[:username], password: params[:password])
+    user = User.create(email: params[:username], password: params[:password], token: params[:token])
     Profile.create(nickname: params[:username], user_id:user.id)
     render json:{userid: user.id}
   end
