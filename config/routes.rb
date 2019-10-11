@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :profiles
   resources :dices
   resources :hands
   resources :turns
@@ -19,4 +20,6 @@ Rails.application.routes.draw do
   get '/my_games', to: "game_users#my_games"
   get '/my_friends', to: "friends#my_friends"
   get 'my_invitations', to: "game_users#my_invitations"
+  get '/winned_games', to: "profile#games_winned"
+  get '/total_games', to: "profile#total_games"
 end
