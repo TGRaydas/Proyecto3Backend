@@ -84,32 +84,26 @@ class ProfilesController < ApplicationController
             end
         end
 
-        player_special_turns = Turn.where(user_id:@user.id).where.not(rule_id:nil)
-        player_average_special = player_special_turns/games
-
-
-
-
-
-
+        player_special_turns = Turn.where(user_id: @user.id).where.not(rule_id: nil)
+        player_average_special = player_special_turns / games
 
     end
-end
 
-private
 
-# Use callbacks to share common setup or constraints between actions.
-def set_profile
-    @profile = Profile.find(params[:id])
-end
+    private
 
-def set_user
-    @user = User.find(params[:user_id])
-end
+    # Use callbacks to share common setup or constraints between actions.
+    def set_profile
+        @profile = Profile.find(params[:id])
+    end
 
-# Only allow a trusted parameter "white list" through.
-def profile_params
-    params.fetch(:profile, {})
-end
+    def set_user
+        @user = User.find(params[:user_id])
+    end
+
+    # Only allow a trusted parameter "white list" through.
+    def profile_params
+        params.fetch(:profile, {})
+    end
 
 end
