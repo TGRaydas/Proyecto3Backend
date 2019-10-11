@@ -32,13 +32,9 @@ class FriendsController < ApplicationController
 		friend_token = User.find(p.user_id).token
 		client = Exponent::Push::Client.new		
 		messages = [
-			{to: friend_token, body:"Friend request from " + p.nickname}
+			{to: friend_token, body:"Friend request from " + params[:user_id]}
 		]
 		client.publish messages
-		puts "amigo:"
-		puts  User.find(p.user_id)
-		puts "friend_token:"
-		puts friend_token
 		render json: {status: "ok", friend_token: friend_token}
 	end
 
