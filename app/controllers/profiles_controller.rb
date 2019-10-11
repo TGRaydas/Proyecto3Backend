@@ -85,8 +85,27 @@ class ProfilesController < ApplicationController
         end
 
         player_special_turns = Turn.where(user_id: @user.id).where.not(rule_id: nil)
-        player_average_special = player_special_turns / games
+        player_average_special = player_special_turns.lenght / games.length
 
+        player_calzos = Round.where(user_action_id: @user.id, action: true)
+        player_good_calzos = player_calzos.where(success: true)
+
+        calzo_percentage = player_good_calzos.lengh / player_dudos/length * 100
+
+        player_dudos = Round.where(user_action_id: @user.id, action: true)
+        player_good_dudos = player_plays.where(success: true)
+
+        dudo_percentage = player_good_dudos.lengh / player_dudos/length * 100
+
+        render json: {total_games: @games.length,
+                      winned_games: @games_winned,
+                      average_position: average_position,
+                      last_hands:last_hands,
+                      final_dice_prom:final_dice_prom,
+                      most_played:most_played,
+                      player_average_special:player_average_special,
+                      calzo_percentage:calzo_percentage,
+                      dudo_percentage: dudo_percentage }
     end
 
 
