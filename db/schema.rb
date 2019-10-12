@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_10_171153) do
+ActiveRecord::Schema.define(version: 2019_10_10_152710) do
 
   create_table "dices", force: :cascade do |t|
     t.integer "hand_id"
@@ -59,6 +59,13 @@ ActiveRecord::Schema.define(version: 2019_10_10_171153) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "games_rules", id: false, force: :cascade do |t|
+    t.integer "game_id", null: false
+    t.integer "rule_id", null: false
+    t.index ["game_id"], name: "index_games_rules_on_game_id"
+    t.index ["rule_id"], name: "index_games_rules_on_rule_id"
+  end
+
   create_table "hands", force: :cascade do |t|
     t.integer "user_id"
     t.integer "round_id"
@@ -71,7 +78,6 @@ ActiveRecord::Schema.define(version: 2019_10_10_171153) do
   create_table "profiles", force: :cascade do |t|
     t.integer "user_id"
     t.string "nickname"
-    t.integer "state"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_profiles_on_user_id"

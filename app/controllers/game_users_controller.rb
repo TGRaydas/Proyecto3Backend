@@ -53,10 +53,22 @@ class GameUsersController < ApplicationController
   def my_invitations
     user = User.find(params[:user_id])
     invitations = user.get_my_invitations
-
     render json: invitations
   end
 
+  def create_invitation
+    game = Game.find(params[:game])
+    friend = User.find(params[:friend])
+    user = User.find(params[:user_id])
+    pos = GameUser.where(game_id: game).order(position: :desc).first
+    game_user = GameUser.create(game_id: game.id, user_id: friend.id, position:(pos.position + 1))
+    client = Exponent::Push::Client.new   
+    messages = [
+      {to: friend.token, body:"Games invitation from " + params[:user_id]}
+    ]
+    client.publish messages
+    render json: game_user
+  end
 
   # Only allow a trusted parameter "white list" through.
 

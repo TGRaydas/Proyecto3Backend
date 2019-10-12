@@ -37,7 +37,6 @@ class User < ApplicationRecord
   def get_my_invitations
     invitations = []
     game_users = GameUser.where(user_id: self.id, position: nil)
-
     game_users.each do |gu|
       game = Game.find(gu[:game_id])
       inviter = GameUser.where(game_id: game[:id], position: 1).first
