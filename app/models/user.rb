@@ -45,4 +45,15 @@ class User < ApplicationRecord
     end
     invitations
   end
+
+  def games_winned
+    games_winned = GameUser.where(final_place: 1, user_id: self.id)
+    games_winned
+  end
+
+  def total_games
+    games = GameUser.where(user_id: self.id).where.not(final_place: !nil)
+    games
+  end
+
 end

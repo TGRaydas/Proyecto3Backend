@@ -1,5 +1,5 @@
 class Turn < ApplicationRecord
-  belongs_to :suit
-  belongs_to :rule
+  belongs_to :suit, optional: true
+  belongs_to :rule, optional: true
   belongs_to :round
 end
