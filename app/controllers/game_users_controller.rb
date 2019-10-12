@@ -64,7 +64,7 @@ class GameUsersController < ApplicationController
     game_user = GameUser.create(game_id: game.id, user_id: friend.id, position:(pos.position + 1))
     client = Exponent::Push::Client.new   
     messages = [
-      {to: friend.token, body:"Games invitation from " + params[:user_id]}
+      {to: friend.token, body:"Games invitation from " + user.profile.nickname}
     ]
     client.publish messages
     render json: game_user
