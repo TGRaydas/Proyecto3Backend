@@ -14,6 +14,14 @@ class User < ApplicationRecord
     hand.dices
   end
 
+  def my_accepted_games
+    games = GameUser.where(user_id: self.id).where.not(position: nil)
+    my_games = []
+	games.each do |g|
+		my_games.push(Game.find(g.game_id))
+	end  
+    return my_games	
+end
   def get_my_friends(nickname)
     friends = []
     receivers = Friend.where(user_receiver_id: self.id, state:2)

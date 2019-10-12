@@ -46,7 +46,7 @@ class GameUsersController < ApplicationController
   end
 
   def my_games
-    @games = User.find(game_user_params[:user_id]).games
+    @games = User.find(game_user_params[:user_id]).my_accepted_games
     render json: @games
   end
 
@@ -61,7 +61,7 @@ class GameUsersController < ApplicationController
     friend = User.find(params[:friend])
     user = User.find(params[:user_id])
     pos = GameUser.where(game_id: game).order(position: :desc).first
-    game_user = GameUser.create(game_id: game.id, user_id: friend.id, position:(pos.position + 1))
+    game_user = GameUser.create(game_id: game.id, user_id: friend.id)
     client = Exponent::Push::Client.new   
     messages = [
       {to: friend.token, body:"Games invitation from " + user.profile.nickname}
