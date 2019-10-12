@@ -38,7 +38,16 @@ class GameUsersController < ApplicationController
     @game_user.destroy
   end
 
-
+  def update_game_request
+    game = GameUser.find(params[:game_user_id])
+    position = GameUser.where(game_id: params[:game_user_id]).order(position: :desc).first
+    if params[:status] == 1
+      game.update(accepted: false)
+    else
+      game.update(position: position.position + 1, accepted: true)
+    end
+    render json: game
+  end
 
   # Use callbacks to share common setup or constraints between actions.
   def set_game_user

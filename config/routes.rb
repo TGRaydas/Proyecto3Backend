@@ -20,5 +20,6 @@ Rails.application.routes.draw do
   get '/my_friends', to: "friends#my_friends"
   get '/my_invitations', to: "game_users#my_invitations"
   get '/statistics', to: "profile#statistics"
+  post '/update_game_request', to: "game_users#update_game_request"
   post '/game_invitation/create', to: "game_users#create_invitation"
 end
