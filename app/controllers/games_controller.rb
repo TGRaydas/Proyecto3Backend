@@ -21,7 +21,6 @@ class GamesController < ApplicationController
     rules = params[:rules]
     if @game.save
       rules.each do |r|
-	puts r
         GameRule.create(game_id:@game.id, rule_id:r[:id])
       end
       GameUser.create(user_id: params[:user_id], game_id:@game.id, position: 1, final_place:nil)
