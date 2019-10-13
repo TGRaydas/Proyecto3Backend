@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_10_152710) do
+ActiveRecord::Schema.define(version: 2019_10_12_213758) do
 
   create_table "dices", force: :cascade do |t|
     t.integer "hand_id"
@@ -64,6 +64,7 @@ ActiveRecord::Schema.define(version: 2019_10_10_152710) do
     t.integer "round_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "dice_quantity"
     t.index ["round_id"], name: "index_hands_on_round_id"
     t.index ["user_id"], name: "index_hands_on_user_id"
   end
