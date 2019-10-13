@@ -7,13 +7,21 @@ class User < ApplicationRecord
   has_many :hand
   has_many :game_users
   has_many :games, through: :game_users
-
+  has_one :profile
   def get_last_hand_on_game(game_id)
     actual_round = Round.where(game_id: game_id).order(created_at: :desc).first
     hand = Hand.where(user_id: self.id, round_id: actual_round.id).first
     hand.dices
   end
 
+  def my_accepted_games
+    games = GameUser.where(user_id: self.id).where.not(position: nil)
+    my_games = []
+	games.each do |g|
+		my_games.push(Game.find(g.game_id))
+	end  
+    return my_games	
+end
   def get_my_friends(nickname)
     friends = []
     receivers = Friend.where(user_receiver_id: self.id, state:2)

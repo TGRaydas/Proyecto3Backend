@@ -38,7 +38,16 @@ class GameUsersController < ApplicationController
     @game_user.destroy
   end
 
-
+  def update_game_request
+    game = GameUser.find(params[:game_user_id])
+    position = GameUser.where(game_id: params[:game_user_id]).order(position: :desc).first
+    if params[:status] == 1
+      game.update(accepted: false)
+    else
+      game.update(position: position.position + 1, accepted: true)
+    end
+    render json: game
+  end
 
   # Use callbacks to share common setup or constraints between actions.
   def set_game_user
@@ -46,17 +55,29 @@ class GameUsersController < ApplicationController
   end
 
   def my_games
-    @games = User.find(game_user_params[:user_id]).games
+    @games = User.find(game_user_params[:user_id]).my_accepted_games
     render json: @games
   end
 
   def my_invitations
     user = User.find(params[:user_id])
     invitations = user.get_my_invitations
-
     render json: invitations
   end
 
+  def create_invitation
+    game = Game.find(params[:game])
+    friend = User.find(params[:friend])
+    user = User.find(params[:user_id])
+    pos = GameUser.where(game_id: game).order(position: :desc).first
+    game_user = GameUser.create(game_id: game.id, user_id: friend.id)
+    client = Exponent::Push::Client.new   
+    messages = [
+      {to: friend.token, body:"Games invitation from " + user.profile.nickname}
+    ]
+    client.publish messages
+    render json: game_user
+  end
 
   # Only allow a trusted parameter "white list" through.
 
