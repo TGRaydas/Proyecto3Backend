@@ -13,6 +13,12 @@ class HandsController < ApplicationController
     render json: @hand
   end
 
+  def my_hand
+    user = User.find(params[:user_id])
+    hand = user.get_last_hand_on_game(params[:game_id])
+    render json:hand
+  end
+
   # POST /hands
   def create
     @hand = Hand.new(hand_params)
