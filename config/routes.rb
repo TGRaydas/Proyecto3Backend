@@ -23,5 +23,5 @@ Rails.application.routes.draw do
   get '/statistics', to: "profiles#statistics"
   post '/update_game_request', to: "game_users#update_game_request"
   post '/game_invitation/create', to: "game_users#create_invitation"
-  get '/game_started', to: "game#started_game"
+  get '/game_started', to: "games#started_game"
 end

@@ -45,7 +45,7 @@ class GamesController < ApplicationController
     else
       round = Round.where(game_id: game.game_id).first
       if round.nil?
-        render json:{status: "started"}
+        render json:{status: false}
       else
         render json:{status: true}
       end
