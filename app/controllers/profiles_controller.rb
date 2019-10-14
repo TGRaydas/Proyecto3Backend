@@ -39,6 +39,13 @@ class ProfilesController < ApplicationController
     end
 
     def statistics
+        #  Vicente
+        # user = User.find(params[user_id])
+        # total_games = user.total_games
+        # won_games = user.won_games
+        # percentage_won_games = user.percentage_won_games
+
+        # ---- Lucho -----
         games = @user.total_games
         if games.length >0
             games_winned = games.where(final_place: 1)

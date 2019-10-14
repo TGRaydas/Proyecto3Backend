@@ -58,8 +58,18 @@ end
   end
 
   def total_games
-    games = GameUser.where(user_id: self.id).where.not(final_place: nil)
+    games = GameUser.where(user_id: self.id, accepted: true).where.not(final_place: nil)
     games
+  end
+
+  def won_games
+    won_games = GameUser.where(user_id: self.id, accepted: true, final_place: 1)
+    won_games
+  end
+
+  def percentage_won_games
+    percentage_won_games = ((won_games.length.to_f / total_games.length.to_f) * 100).round(2)
+    percentage_won_games
   end
 
 end
