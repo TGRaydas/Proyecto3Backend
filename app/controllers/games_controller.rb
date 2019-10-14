@@ -38,7 +38,19 @@ class GamesController < ApplicationController
       render json: @game.errors, status: :unprocessable_entity
     end
   end
-
+  def started_game
+    game = GameUser.where(user_id: params[:user_id], position: 1, game_id: params[:game_id]).first
+    if game.nil?
+      render json:{status: false}
+    else
+      round = Round.where(game_id: game.game_id).first
+      if round.nil?
+        render json:{status: "started"}
+      else
+        render json:{status: true}
+      end
+    end
+  end
   # DELETE /games/1
   def destroy
     @game.destroy
