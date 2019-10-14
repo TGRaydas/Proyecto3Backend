@@ -58,8 +58,33 @@ end
   end
 
   def total_games
-    games = GameUser.where(user_id: self.id).where.not(final_place: nil)
+    games = GameUser.where(user_id: self.id, accepted: true).where.not(final_place: nil)
     games
+  end
+
+  def won_games
+    won_games = GameUser.where(user_id: self.id, accepted: true, final_place: 1)
+    won_games
+  end
+
+  def percentage_won_games
+    percentage_won_games = ((won_games.length.to_f / total_games.length.to_f) * 100).round(2)
+    percentage_won_games
+  end
+
+  def average_final_position
+    average_final_position = total_games.average(:final_place).to_f.round(2)
+    average_final_position
+  end
+
+  # def average_final_dice
+  #   average_final_dice =
+  # end
+
+  def most_frequent_play
+    turns = Turn.where(user_id: self.id)
+    most_frequent_play = turns.group(:suit_id, :quantity).count.sort_by{|pair, amount| amount}.last
+    most_frequent_play
   end
 
 end
