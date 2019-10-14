@@ -13,7 +13,24 @@ class GamesController < ApplicationController
     render json: @game
   end
 
+  def start_game
+    game = Game.find(params[:game_id])
+    round = Round.create(game_id: game.id)
+    users = GameUser.where(game_id: game.id)
+    users.each do |user|
+      hand = Hand.create(round_id: round.id, user_id: user.user_id)
+      (0..4).each do |i|
+        Dice.create(hand_id: hand.id, suit_id: Suit.all.sample.id)
+      end
+      client = Exponent::Push::Client.new
+        messages = [
+            {to: User.find(user.user_id).token, body: "Game started: " + game.name}
+        ]
+        client.publish messages
+    end
 
+    render json:{started: true}
+  end
 
   # POST /games
   def create
@@ -38,6 +55,7 @@ class GamesController < ApplicationController
       render json: @game.errors, status: :unprocessable_entity
     end
   end
+
   def started_game
     game = GameUser.where(user_id: params[:user_id], position: 1, game_id: params[:game_id]).first
     if game.nil?
