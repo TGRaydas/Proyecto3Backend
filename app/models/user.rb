@@ -72,4 +72,19 @@ end
     percentage_won_games
   end
 
+  def average_final_position
+    average_final_position = total_games.average(:final_place).to_f.round(2)
+    average_final_position
+  end
+
+  # def average_final_dice
+  #   average_final_dice =
+  # end
+
+  def most_frequent_play
+    turns = Turn.where(user_id: self.id)
+    most_frequent_play = turns.group(:suit_id, :quantity).count.sort_by{|pair, amount| amount}.last
+    most_frequent_play
+  end
+
 end

@@ -40,10 +40,12 @@ class ProfilesController < ApplicationController
 
     def statistics
         #  Vicente
-        # user = User.find(params[user_id])
-        # total_games = user.total_games
-        # won_games = user.won_games
-        # percentage_won_games = user.percentage_won_games
+        user = User.find(params[user_id])
+        total_games = user.total_games
+        won_games = user.won_games
+        percentage_won_games = user.percentage_won_games
+        average_final_position = user.average_final_position
+        most_frequent_play = user.most_frequent_play
 
         # ---- Lucho -----
         games = @user.total_games
