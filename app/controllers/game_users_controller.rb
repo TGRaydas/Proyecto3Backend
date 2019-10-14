@@ -40,7 +40,9 @@ class GameUsersController < ApplicationController
 
   def update_game_request
     game = GameUser.find(params[:game_user_id])
-    position = GameUser.where(game_id: params[:game_user_id]).order(position: :desc).first
+    puts params[:game_user_id]
+    position = GameUser.where(game_id: game.game_id).where.not(position: nil).order(position: :desc).first
+    puts position
     if params[:status] == 1
       game.update(accepted: false)
     else

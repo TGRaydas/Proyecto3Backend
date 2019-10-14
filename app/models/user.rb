@@ -48,8 +48,11 @@ end
     game_users.each do |gu|
       game = Game.find(gu[:game_id])
       inviter = GameUser.where(game_id: game[:id], position: 1).first
+      if inviter.nil?
+        puts game.id
+      end
       profile = Profile.find_by_user_id(inviter[:user_id])
-      invitations.push({game_user: inviter, profile:profile, game:game})
+      invitations.push({game_user_inviter: inviter, profile:profile, game:game, game_user: gu})
     end
     invitations
   end
