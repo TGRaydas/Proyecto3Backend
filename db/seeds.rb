@@ -202,176 +202,176 @@ Turn.create(round_id: 2, user_id: 2, rule_id: nil, suit_id: 1, quantity: 4)
 Turn.create(round_id: 2, user_id: 3, rule_id: 4, suit_id: 6, quantity: 9)
 
 game_count = 0
-# (1..10).each do |g|
-#     puts "Juego #{game_count}"
-#     game_count += 1
-#     game = Game.create(name: "game #{g}", finished: false)
-#     users = User.all
-#     owner = users[rand(0..users.length - 1)]
-#     GameUser.create(user_id: owner.id, game_id: game.id, position: 1, accepted: true, final_place: nil)
-#     owner_friendships = Friend.where(user_receiver_id: owner.id, state: 2).or(Friend.where(user_sender_id: owner.id, state: 2))
-#     owner_friends = []
-#     players = []
+(1..10).each do |g|
+    puts "Juego #{game_count}"
+    game_count += 1
+    game = Game.create(name: "game #{g}", finished: false)
+    users = User.all
+    owner = users[rand(0..users.length - 1)]
+    GameUser.create(user_id: owner.id, game_id: game.id, position: 1, accepted: true, final_place: nil)
+    owner_friendships = Friend.where(user_receiver_id: owner.id, state: 2).or(Friend.where(user_sender_id: owner.id, state: 2))
+    owner_friends = []
+    players = []
 
-#     owner_friendships.each do |of|
-#         if of.user_sender_id == owner.id
-#             owner_friends.push(User.find(of.user_receiver_id))
-#         else
-#             owner_friends.push(User.find(of.user_sender_id))
-#         end
-#     end
+    owner_friendships.each do |of|
+        if of.user_sender_id == owner.id
+            owner_friends.push(User.find(of.user_receiver_id))
+        else
+            owner_friends.push(User.find(of.user_sender_id))
+        end
+    end
 
-#     position = 2
+    position = 2
 
-#     while players.length < 2
-#         owner_friends.each do |of|
-#             accepted = rand(1..2)
-#             if accepted == 1
-#                 GameUser.create(user_id: of.id, game_id: game.id, position: position, accepted: true)
+    while players.length < 2
+        owner_friends.each do |of|
+            accepted = rand(1..2)
+            if accepted == 1
+                GameUser.create(user_id: of.id, game_id: game.id, position: position, accepted: true)
                 
-#                 position += 1
-#             else
-#                 GameUser.create(user_id: of.id, game_id: game.id, position: nil, accepted: false)
-#             end
-#         end
-#         players = GameUser.where(game_id: game.id).order(position: :asc)
-#         players.each do |p|
-#             owner_friends.delete(User.find(p.user_id))
-#         end
-#     end
+                position += 1
+            else
+                GameUser.create(user_id: of.id, game_id: game.id, position: nil, accepted: false)
+            end
+        end
+        players = GameUser.where(game_id: game.id).order(position: :asc)
+        players.each do |p|
+            owner_friends.delete(User.find(p.user_id))
+        end
+    end
     
-#     game_finished = false
-#     current_position = 1
-#     place = players.length
-#     round_count = 0 
-#     while !game_finished
-#         puts "Ronda #{round_count}"
-#         round = Round.create(game_id: game.id)
-#         players.each do |p| #Crear una mano para cada jugador
-#             prev_round = Round.where(game_id: game.id).order(created_at: :desc).second
-#             if p.final_place != nil #Si el jugador perdio, no le crees una mano
-#                 next
-#             end
-#             if prev_round != nil
-#                 previous_hand = Hand.where(user_id: p.user_id, round_id: prev_round.id).first
-#                 Hand.create(user_id: p.user_id, round_id: round.id, dice_quantity: previous_hand.dice_quantity)
-#             else
-#                 Hand.create(user_id: p.user_id, round_id: round.id, dice_quantity: 5)
-#             end
-#         end
-#         hands = Hand.where(round_id: round.id)
-#         dices = []
-#         hands.each do |h| #crear los dados para cada mano
-#             (1..h.dice_quantity).each do |_|
-#                 dices.push(Dice.create(suit_id: rand(1..6), hand_id: h.id))
-#             end
-#         end
+    game_finished = false
+    current_position = 1
+    place = players.length
+    round_count = 0 
+    while !game_finished
+        puts "Ronda #{round_count}"
+        round = Round.create(game_id: game.id)
+        players.each do |p| #Crear una mano para cada jugador
+            prev_round = Round.where(game_id: game.id).order(created_at: :desc).second
+            if p.final_place != nil #Si el jugador perdio, no le crees una mano
+                next
+            end
+            if prev_round != nil
+                previous_hand = Hand.where(user_id: p.user_id, round_id: prev_round.id).first
+                Hand.create(user_id: p.user_id, round_id: round.id, dice_quantity: previous_hand.dice_quantity)
+            else
+                Hand.create(user_id: p.user_id, round_id: round.id, dice_quantity: 5)
+            end
+        end
+        hands = Hand.where(round_id: round.id)
+        dices = []
+        hands.each do |h| #crear los dados para cada mano
+            (1..h.dice_quantity).each do |_|
+                dices.push(Dice.create(suit_id: rand(1..6), hand_id: h.id))
+            end
+        end
 
-#         round_finished = false
+        round_finished = false
 
-#         actual_dice_quantity = Hand.where(round_id: round.id).sum("dice_quantity") #CAntidad total de dados que hay en el juego
-#         round_count = 0
-#         while !round_finished
-#             puts "Turno #{round_count}"
-#             round_count +=1
-#             actual_player = User.find(players.where(position: current_position).first.user_id)
-#             actual_hand = Hand.where(user_id: actual_player.id, round_id: round.id).first
-#             next_player = nil
-#             last_turn = Turn.where(round_id: round.id).order(created_at: :desc).first
-#             if last_turn != nil #Del turno 2 en adelante
-#                 previous_player = search_previous_alive_player(current_position, players)
-#                 previous_player_hand = Hand.where(user_id: previous_player.id).first
-
-
-#                 probability = rand(1..10)
-#                 #AQUI HAY QUE ASEGURARSE QUE SI LA CANTIDAD DE DADOS ES 1 MENOR QUE LA CANTIDAD TOTAL DE DADOS, HAY QUE DUDA
-#                 if last_turn.quantity >= actual_dice_quantity - 2
-#                     probability = 9
-#                 end
-#                 if probability.between?(1, 2) #CALZO
-#                     action = true
-#                     success = false
-#                     new_dice_quantity = actual_hand.dice_quantity
-#                     if check_calzo(last_turn.quantity, last_turn.suit_id, dices)
-#                         success = true
-#                         if actual_hand.dice_quantity <= 4
-#                             new_dice_quantity += 1
-#                         end
-#                     else
-#                         new_dice_quantity -= 1
-#                     end
+        actual_dice_quantity = Hand.where(round_id: round.id).sum("dice_quantity") #CAntidad total de dados que hay en el juego
+        round_count = 0
+        while !round_finished
+            puts "Turno #{round_count}"
+            round_count +=1
+            actual_player = User.find(players.where(position: current_position).first.user_id)
+            actual_hand = Hand.where(user_id: actual_player.id, round_id: round.id).first
+            next_player = nil
+            last_turn = Turn.where(round_id: round.id).order(created_at: :desc).first
+            if last_turn != nil #Del turno 2 en adelante
+                previous_player = search_previous_alive_player(current_position, players)
+                previous_player_hand = Hand.where(user_id: previous_player.id).first
 
 
-#                     next_player = actual_player
-#                     actual_hand.update(dice_quantity: new_dice_quantity)
-#                     round.update(user_action_id: actual_player.id, success: success, action: action)
-#                     round_finished = true
-#                 elsif probability.between?(3, 7)
-#                     #CONDICION DE SEGUIR LA PARTIDA
-#                     probability2 = 1
-#                     if last_turn.suit_id == 6
-#                         probability2 = rand(3..4)
-#                     elsif 2 <= last_turn.suit_id <= 5
-#                         probability2 = rand(1..4)
-#                     else
-#                         probability2 = rand(1..3)
-#                     end
-#                     new_dice_quantity = last_turn.quantity
-#                     new_suit = last_turn.suit_id
-#                     #PROBABILIDAD DE SUBIR LA PINTA Y SUBIR EL NUMERO
-#                     if probability2 == 1
-#                         new_suit +=1
-#                         new_dice_quantity +=1
-#                     # PROBABILIDAD DE SUBIR LA PINTA Y MANTENER EL NUMERO
-#                     elsif probability2 == 2
-#                         new_suit += 1
-#                     # PROBABILIDAD DE MANTENER LA PINTA Y SUBIR EL NUMERO
-#                     elsif probability2 == 3
-#                         new_dice_quantity += 1
-#                     # BAJAR PINTA SUBIR NUMERO
-#                     else
-#                         new_suit -= 1
-#                         new_dice_quantity += 1
-#                     end
-#                     Turn.create(suit_id: new_suit, round_id: round.id, user_id: actual_player.id, quantity: new_dice_quantity)
-#                     next_player = search_next_alive_player(current_position, players)
-#                 elsif probability.between?(8, 10)
-#                     #CONDICION DE DUDAR
-#                     action = false
-#                     success = false
-#                     actual_dice_quantity = actual_hand.dice_quantity
-#                     if check_dudo(last_turn.quantity, last_turn.suit_id, dices)
-#                         success = true
-#                         previous_player_hand.update(dice_quantity: previous_player_hand.dice_quantity - 1)
-#                         next_player = previous_player
-#                     else
-#                         actual_hand.update(dice_quantity: actual_dice_quantity - 1)
-#                     end
-#                     round.update(user_action_id: actual_player.id, success: success, action: action)
-#                     round_finished = true
-#                 end
+                probability = rand(1..10)
+                #AQUI HAY QUE ASEGURARSE QUE SI LA CANTIDAD DE DADOS ES 1 MENOR QUE LA CANTIDAD TOTAL DE DADOS, HAY QUE DUDA
+                if last_turn.quantity >= actual_dice_quantity - 2
+                    probability = 9
+                end
+                if probability.between?(1, 2) #CALZO
+                    action = true
+                    success = false
+                    new_dice_quantity = actual_hand.dice_quantity
+                    if check_calzo(last_turn.quantity, last_turn.suit_id, dices)
+                        success = true
+                        if actual_hand.dice_quantity <= 4
+                            new_dice_quantity += 1
+                        end
+                    else
+                        new_dice_quantity -= 1
+                    end
 
-#                 if hands.where(user_id:next_player.id).first.dice_quantity <= 0 #Si un jugador se quedo sin dados
-#                     players.where(user_id: next_player.id).first.update(final_place: place)
-#                     place -= 1
-#                 end
 
-#                 if place <= 1 #Si solamente queda un jugador
-#                     players.where(user_id: actual_player.id).first.update(final_place: place)
-#                     game_finished = true
-#                     game.update(finished: true)
-#                 end
+                    next_player = actual_player
+                    actual_hand.update(dice_quantity: new_dice_quantity)
+                    round.update(user_action_id: actual_player.id, success: success, action: action)
+                    round_finished = true
+                elsif probability.between?(3, 7)
+                    #CONDICION DE SEGUIR LA PARTIDA
+                    probability2 = 1
+                    if last_turn.suit_id == 6
+                        probability2 = rand(3..4)
+                    elsif 2 <= last_turn.suit_id <= 5
+                        probability2 = rand(1..4)
+                    else
+                        probability2 = rand(1..3)
+                    end
+                    new_dice_quantity = last_turn.quantity
+                    new_suit = last_turn.suit_id
+                    #PROBABILIDAD DE SUBIR LA PINTA Y SUBIR EL NUMERO
+                    if probability2 == 1
+                        new_suit +=1
+                        new_dice_quantity +=1
+                    # PROBABILIDAD DE SUBIR LA PINTA Y MANTENER EL NUMERO
+                    elsif probability2 == 2
+                        new_suit += 1
+                    # PROBABILIDAD DE MANTENER LA PINTA Y SUBIR EL NUMERO
+                    elsif probability2 == 3
+                        new_dice_quantity += 1
+                    # BAJAR PINTA SUBIR NUMERO
+                    else
+                        new_suit -= 1
+                        new_dice_quantity += 1
+                    end
+                    Turn.create(suit_id: new_suit, round_id: round.id, user_id: actual_player.id, quantity: new_dice_quantity)
+                    next_player = search_next_alive_player(current_position, players)
+                elsif probability.between?(8, 10)
+                    #CONDICION DE DUDAR
+                    action = false
+                    success = false
+                    actual_dice_quantity = actual_hand.dice_quantity
+                    if check_dudo(last_turn.quantity, last_turn.suit_id, dices)
+                        success = true
+                        previous_player_hand.update(dice_quantity: previous_player_hand.dice_quantity - 1)
+                        next_player = previous_player
+                    else
+                        actual_hand.update(dice_quantity: actual_dice_quantity - 1)
+                    end
+                    round.update(user_action_id: actual_player.id, success: success, action: action)
+                    round_finished = true
+                end
 
-#             else
-#                 Turn.create(suit_id: rand(1..6), round_id: round.id, user_id: actual_player.id, quantity: rand(1..actual_dice_quantity / 2))
-#                 next_player = search_next_alive_player(current_position, players)
-#             end
+                if hands.where(user_id:next_player.id).first.dice_quantity <= 0 #Si un jugador se quedo sin dados
+                    players.where(user_id: next_player.id).first.update(final_place: place)
+                    place -= 1
+                end
 
-#             current_position = GameUser.where(game_id: game.id, user_id:next_player.id).first.position
-#         end
+                if place <= 1 #Si solamente queda un jugador
+                    players.where(user_id: actual_player.id).first.update(final_place: place)
+                    game_finished = true
+                    game.update(finished: true)
+                end
+
+            else
+                Turn.create(suit_id: rand(1..6), round_id: round.id, user_id: actual_player.id, quantity: rand(1..actual_dice_quantity / 2))
+                next_player = search_next_alive_player(current_position, players)
+            end
+            
+            current_position = GameUser.where(game_id: game.id, user_id:next_player.id).first.position
+        end
 
         
-#     end
-# end
+    end
+end
 
 
