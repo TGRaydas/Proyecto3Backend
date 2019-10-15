@@ -10,7 +10,7 @@ class Users::SessionsController < Devise::SessionsController
 
   # POST /resource/sign_in
   def create
-    user = User.find_by_email(params[:username])
+    user = User.find_by_email(params[:email])
     token = params[:token]
     #user.update(token: token)
     if user.valid_password?(params[:password])

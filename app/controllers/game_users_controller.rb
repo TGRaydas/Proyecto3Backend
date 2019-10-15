@@ -52,6 +52,8 @@ class GameUsersController < ApplicationController
     render json: game_user
   end
 
+
+
   # Use callbacks to share common setup or constraints between actions.
   def set_game_user
     @game_user = GameUser.find(params[:id])

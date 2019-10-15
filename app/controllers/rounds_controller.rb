@@ -1,51 +1,52 @@
 class RoundsController < ApplicationController
-  before_action :set_round, only: [:show, :update, :destroy]
+    before_action :set_round, only: [:show, :update, :destroy, :is_my_turn?]
 
-  # GET /rounds
-  def index
-    @rounds = Round.all
+    # GET /rounds
+    def index
+        @rounds = Round.all
 
-    render json: @rounds
-  end
-
-  # GET /rounds/1
-  def show
-    render json: @round
-  end
-
-  # POST /rounds
-  def create
-    @round = Round.new(round_params)
-
-    if @round.save
-      render json: @round, status: :created, location: @round
-    else
-      render json: @round.errors, status: :unprocessable_entity
+        render json: @rounds
     end
-  end
 
-  # PATCH/PUT /rounds/1
-  def update
-    if @round.update(round_params)
-      render json: @round
-    else
-      render json: @round.errors, status: :unprocessable_entity
+    # GET /rounds/1
+    def show
+        render json: @round
     end
-  end
 
-  # DELETE /rounds/1
-  def destroy
-    @round.destroy
-  end
+    # POST /rounds
+    def create
+        @round = Round.new(round_params)
+        if @round.save
+            render json: @round, status: :created, location: @round
+        else
+            render json: @round.errors, status: :unprocessable_entity
+        end
+    end
 
-  private
+    # PATCH/PUT /rounds/1
+    def update
+        if @round.update(round_params)
+            render json: @round
+        else
+            render json: @round.errors, status: :unprocessable_entity
+        end
+    end
+
+    # DELETE /rounds/1
+    def destroy
+        @round.destroy
+    end
+
+
+    private
+
     # Use callbacks to share common setup or constraints between actions.
     def set_round
-      @round = Round.find(params[:id])
+        @round = Round.where(game_id:params[:game_id]).order(created_at: :desc).first
     end
 
     # Only allow a trusted parameter "white list" through.
     def round_params
-      params.require(:round).permit(:game_id, :action, :success)
+        params.require(:round).permit(:game_id, :action, :success)
     end
 end
