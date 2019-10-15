@@ -5,7 +5,7 @@ class Round < ApplicationRecord
   has_many :turns
 
   def finished?
-    if self.user_action_id != nil
+    if self.user_action_id.nil?
       false
     else
       true

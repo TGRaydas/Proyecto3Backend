@@ -45,17 +45,33 @@ class Game < ApplicationRecord
         hands = actual_round.hands
         dices = {1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0, 6 => 0}
         hands.each do |h|
-            h.dices.each do |d|
+            h.dice.each do |d|
                 dices[d.suit_id] += 1
             end
         end
         dices
     end
 
+    def notify_next_turn(user_id)
+
+        client = Exponent::Push::Client.new
+        messages = [
+            {to: User.find(user_id).token, body: "Is your turn to play in " + self.name}
+        ]
+        client.publish messages
+    end
+
     def next_player
         game_rounds = Round.where(game_id: self.id).order(created_at: :desc)
+        if game_rounds.length == 1 # Si es la primera ronda
+            turns = Turn.where(round_id: game_rounds.first.id)
+            if turns.length == 0 #Si es el primer turno
+                player_with_first_position = GameUser.where(game_id: self.id, position: 1).first
+                return User.find(player_with_first_position.user_id)
+            end
+        end
         last_round = game_rounds.first
-        if last_round.finished?
+        if last_round.finished? #Si la ronda pasada terminó
             user_action_position = last_round.user_action_position
             if last_round.calzo?
                 return User.find(last_round.user_action_id)
@@ -66,7 +82,7 @@ class Game < ApplicationRecord
                     return User.find(last_round.user_action_id)
                 end
             end
-        else
+        else #Si la ronda no ha terminado
             last_player_position = last_round.last_turn_user_position
             return search_next_alive_player(last_player_position)
         end
@@ -91,6 +107,8 @@ class Game < ApplicationRecord
                 Dice.create(suit_id: rand(1..6), hand_id: hand.id)
             end
         end
+        next_user_id = self.next_player.id
+        self.notify_next_turn(next_user_id)
     end
 
     def check_calzo(looked_suit, looked_quantity)
@@ -122,6 +140,14 @@ class Game < ApplicationRecord
             end
         end
         return false
+    end
+
+    def change_dice_quantity_from_hand(round_id, user_id, update_quantity)
+        hand = Hand.where(round_id: round_id, user_id: user_id).first
+        if update_quantity > 0 and hand.dice_quantity == 5
+            return
+        end
+        hand.update(dice_quantity: hand.dice_quantity + update_quantity)
     end
 end
 

@@ -27,5 +27,8 @@ Rails.application.routes.draw do
     post '/start_game', to: "games#start_game"
     get '/my_hand', to: "hands#my_hand"
     get '/games/:id/give_options', to: "games#give_options"
-    get '/is_my_turn', to: "rounds#is_my_turn?"
+    get '/games/:id/is_my_turn', to: "games#is_my_turn"
+    get '/games/:id/dices_in_round', to: "games#current_dices"
+    post '/games/:id/end_round', to: "games#end_round"
+    post '/games/:id/end_turn', to: "games#end_turn"
 end
