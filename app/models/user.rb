@@ -122,4 +122,20 @@ end
     percentage_special_moves
   end
 
+  def lost_games_last_place
+    user_games = GameUser.where(user_id: self.id, accepted: true)
+    lost_games_last_place = 0
+    user_games.each do |ug|
+      if ug.final_place == GameUser.where(game_id: ug.game_id, accepted: true).length
+        lost_games_last_place += 1
+      end
+    end
+    lost_games_last_place
+  end
+
+  def percentage_lost_games_last_place
+    percentage_lost_games_last_place = ((lost_games_last_place.to_f / total_games.length.to_f) * 100).round
+    percentage_lost_games_last_place
+  end
+
 end

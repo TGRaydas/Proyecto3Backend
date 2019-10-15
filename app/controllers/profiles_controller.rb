@@ -50,6 +50,8 @@ class ProfilesController < ApplicationController
             percentage_correct_calzos = user.percentage_correct_calzos
             average_final_dices_won_games = user.average_final_dices_won_games
             percentage_special_moves = user.percentage_special_moves
+            lost_games_last_place = user.lost_games_last_place
+            percentage_lost_games_last_place = user.percentage_lost_games_last_place
             render json: {
                 state: "success",
                 total_games: total_games.length,
@@ -60,12 +62,14 @@ class ProfilesController < ApplicationController
                 percentage_correct_dudos: percentage_correct_dudos,
                 percentage_correct_calzos: percentage_correct_calzos,
                 average_final_dices_won_games: average_final_dices_won_games,
-                percentage_special_moves: percentage_special_moves
+                percentage_special_moves: percentage_special_moves,
+                lost_games_last_place: lost_games_last_place,
+                percentage_lost_games_last_place: percentage_lost_games_last_place
             }
         rescue
             render json: {
                 state: "error",
-		total_games: "-",
+		            total_games: "-",
                 won_games: "-",
                 percentage_won_games: "-",
                 average_final_position: "-",
@@ -73,7 +77,9 @@ class ProfilesController < ApplicationController
                 percentage_correct_dudos: "-",
                 percentage_correct_calzos: "-",
                 average_final_dices_won_games: "-",
-                percentage_special_moves: "-"
+                percentage_special_moves: "-",
+                lost_games_last_place: "-",
+                percentage_lost_games_last_place: "-"
             }
         end
     end
