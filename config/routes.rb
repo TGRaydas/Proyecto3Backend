@@ -28,4 +28,5 @@ Rails.application.routes.draw do
     get '/my_hand', to: "hands#my_hand"
     get '/games/:id/give_options', to: "games#give_options"
     get '/is_my_turn', to: "rounds#is_my_turn?"
+    get '/my_user_information/:user_id', to: "profiles#get_my_user_information"
 end
