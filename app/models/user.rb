@@ -77,14 +77,46 @@ end
     average_final_position
   end
 
-  # def average_final_dice
-  #   average_final_dice =
-  # end
+  def average_final_dices_won_games
+    final_dices = []
+    won_games.each do |wg|
+      final_round = Round.where(game_id: wg.game_id).order(created_at: :desc).first
+      final_hand = Hand.where(round_id: final_round.id, user_id: self.id).order(created_at: :desc).first
+      final_dices.push(final_hand.dice_quantity)
+    end
+    average_final_dices_won_games = final_dices.sum.to_f / final_dices.length.to_f
+    average_final_dices_won_games
+  end
 
   def most_frequent_play
-    turns = Turn.where(user_id: self.id)
-    most_frequent_play = turns.group(:suit_id, :quantity).count.sort_by{|pair, amount| amount}.last
-    most_frequent_play
+    most_frequent_play = Turn.where(user_id: self.id).group(:quantity, :suit_id).count.sort_by{|pair, amount| amount}.last
+    most_frequent_play_json = {
+        quantity: most_frequent_play[0][0],
+        suit: most_frequent_play[0][1],
+        frequency: most_frequent_play[1]
+    }
+    most_frequent_play_json
+  end
+
+  def percentage_correct_dudos
+    total_dudos = Round.where(user_action_id: self.id, action: false)
+    correct_dudos = Round.where(user_action_id: self.id, action: false, success: true)
+    percentage_correct_dudos = ((correct_dudos.length.to_f / total_dudos.length.to_f) * 100).round(2)
+    percentage_correct_dudos
+  end
+
+  def percentage_correct_calzos
+    total_calzos = Round.where(user_action_id: self.id, action: true)
+    correct_calzos = Round.where(user_action_id: self.id, action: true, success: true)
+    percentage_correct_calzos = ((correct_calzos.length.to_f / total_calzos.length.to_f) * 100).round(2)
+    percentage_correct_calzos
+  end
+
+  def percentage_special_moves
+    total_turns = Turn.where(user_id: self.id)
+    special_turns = total_turns.where.not(rule_id: nil)
+    percentage_special_moves =  ((special_turns.length.to_f / total_turns.length.to_f) * 100).round(2)
+    percentage_special_moves
   end
 
 end
