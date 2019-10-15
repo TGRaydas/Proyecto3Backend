@@ -146,7 +146,7 @@ game_count = 0
 (1..10).each do |g|
     puts "Juego #{game_count}"
     game_count += 1
-    game = Game.create(name: "game #{g}", finished: false)
+    game = Game.create(name: "game #{g}", finished: false, startable:true)
     users = User.all
     owner = users[rand(0..users.length - 1)]
     GameUser.create(user_id: owner.id, game_id: game.id, position: 1, accepted: true, final_place: nil)

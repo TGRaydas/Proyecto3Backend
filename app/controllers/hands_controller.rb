@@ -15,8 +15,8 @@ class HandsController < ApplicationController
 
   def my_hand
     user = User.find(params[:user_id])
-    hand = user.get_last_hand_on_game(params[:game_id])
-    render json:hand
+    dices = user.get_last_hand_on_game(params[:game_id])
+    render json: dices
   end
 
   # POST /hands

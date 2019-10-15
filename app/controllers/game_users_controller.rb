@@ -4,7 +4,6 @@ class GameUsersController < ApplicationController
   # GET /game_users
   def index
     @game_users = GameUser.all
-
     render json: @game_users
   end
 
@@ -39,14 +38,18 @@ class GameUsersController < ApplicationController
   end
 
   def update_game_request
-    game = GameUser.find(params[:game_user_id])
-    position = GameUser.where(game_id: game.game_id).where.not(position: nil).order(position: :desc).first
+    game_user = GameUser.find(params[:game_user_id])
+    position = GameUser.where(game_id: game_user.game_id).where.not(position: nil).order(position: :desc).first
     if params[:status] == 1
-      game.update(accepted: false)
+      game_user.update(accepted: false)
     else
-      game.update(position: position.position + 1, accepted: true)
+      game = Game.find(game_user.game_id)
+      if !game.startable
+        game.update(startable: true)
+      end
+      game_user.update(position: position.position + 1, accepted: true)
     end
-    render json: game
+    render json: game_user
   end
 
   # Use callbacks to share common setup or constraints between actions.
@@ -55,7 +58,7 @@ class GameUsersController < ApplicationController
   end
 
   def my_games
-    @games = User.find(game_user_params[:user_id]).my_accepted_games
+    @games = User.find(game_user_params[:user_id]).my_current_games
     render json: @games
   end
 
@@ -86,6 +89,10 @@ class GameUsersController < ApplicationController
     @invitation = GameUser.where(game_id: game_user_params[:game_id], user_id: game_user_params[:user_id])
     last_user = GameUser.where(game_id: game_user_params[:game_id]).where.not(position: nil).order(position: :desc).first
     if invitation.update(accepted: true, position:last_user[:position] + 1)
+      game = Game.find(game_user_params[:game_id])
+      if !game.startable
+        game.update(startable: true)
+      end
       render json: @invitation
     else
       render json: @invitation.errors, status: :unprocessable_entity

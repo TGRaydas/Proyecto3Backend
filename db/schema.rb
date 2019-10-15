@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_12_213758) do
+ActiveRecord::Schema.define(version: 2019_10_15_002427) do
 
   create_table "dices", force: :cascade do |t|
     t.integer "hand_id"
@@ -57,6 +57,7 @@ ActiveRecord::Schema.define(version: 2019_10_12_213758) do
     t.boolean "finished"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "startable"
   end
 
   create_table "hands", force: :cascade do |t|

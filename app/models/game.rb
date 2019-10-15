@@ -23,24 +23,20 @@ class Game < ApplicationRecord
     end
   end
 
-  def search_previous_alive_player(current_position)
-    players = GameUser.where(game_id: self.id, accepted: true)
+  def search_next_alive_player(current_position, players)
     alive = true
     while alive
-      if current_position == 1
-        current_position = players.length
-      elsif current_position > 1
-        current_position -= 1
+      if current_position < players.length
+        current_position += 1
+      elsif current_position == players.length
+        current_position = 1
       end
       puts "players: #{players}, players.length: #{players.length}, players[0]: #{players[0]}"
       possible_player = players.where(position:current_position).first
       if possible_player.final_place == nil
         alive = false
-        puts "search_previous_alive_player return: #{User.find(possible_player.user_id).email}"
         return User.find(possible_player.user_id)
       end
     end
   end
-
-
 end
