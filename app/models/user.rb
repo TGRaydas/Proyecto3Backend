@@ -68,7 +68,7 @@ end
   end
 
   def percentage_won_games
-    percentage_won_games = ((won_games.length.to_f / total_games.length.to_f) * 100).round(2)
+    percentage_won_games = ((won_games.length.to_f / total_games.length.to_f) * 100).round
     percentage_won_games
   end
 
@@ -101,21 +101,21 @@ end
   def percentage_correct_dudos
     total_dudos = Round.where(user_action_id: self.id, action: false)
     correct_dudos = Round.where(user_action_id: self.id, action: false, success: true)
-    percentage_correct_dudos = ((correct_dudos.length.to_f / total_dudos.length.to_f) * 100).round(2)
+    percentage_correct_dudos = ((correct_dudos.length.to_f / total_dudos.length.to_f) * 100).round
     percentage_correct_dudos
   end
 
   def percentage_correct_calzos
     total_calzos = Round.where(user_action_id: self.id, action: true)
     correct_calzos = Round.where(user_action_id: self.id, action: true, success: true)
-    percentage_correct_calzos = ((correct_calzos.length.to_f / total_calzos.length.to_f) * 100).round(2)
+    percentage_correct_calzos = ((correct_calzos.length.to_f / total_calzos.length.to_f) * 100).round
     percentage_correct_calzos
   end
 
   def percentage_special_moves
     total_turns = Turn.where(user_id: self.id)
     special_turns = total_turns.where.not(rule_id: nil)
-    percentage_special_moves =  ((special_turns.length.to_f / total_turns.length.to_f) * 100).round(2)
+    percentage_special_moves =  ((special_turns.length.to_f / total_turns.length.to_f) * 100).round
     percentage_special_moves
   end
 
