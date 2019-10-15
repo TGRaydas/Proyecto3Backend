@@ -53,7 +53,6 @@ class Game < ApplicationRecord
     end
 
     def notify_next_turn(user_id)
-
         client = Exponent::Push::Client.new
         messages = [
             {to: User.find(user_id).token, body: "Is your turn to play in " + self.name}
@@ -83,7 +82,8 @@ class Game < ApplicationRecord
                 end
             end
         else #Si la ronda no ha terminado
-            last_player_position = last_round.last_turn_user_position
+            last_player_position = last_round.last_turn_user_position.position
+            puts "wea", last_player_position, "fin"
             return search_next_alive_player(last_player_position)
         end
     end
@@ -112,7 +112,7 @@ class Game < ApplicationRecord
     end
 
     def check_calzo(looked_suit, looked_quantity)
-        dices = self.current_dices
+        suits = self.current_dices
         if looked_suit == 1
             if suits[looked_suit] == looked_quantity
                 return true

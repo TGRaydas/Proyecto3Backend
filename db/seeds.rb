@@ -29,12 +29,9 @@ end
 
 def check_dudo(doubt_quantity, doubt_suit, dices)
     suits = {1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0, 6 => 0}
-    puts "suits 1: #{suits}"
-    puts "suits[1]: #{suits[1]}"
     dices.each do |d|
         suits[d.suit.id] += 1
     end
-    puts "suits 2: #{suits}"
     if doubt_suit == 1
         if suits[doubt_suit] < doubt_quantity
             true

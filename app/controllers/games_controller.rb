@@ -1,8 +1,9 @@
 class GamesController < ApplicationController
-    before_action :set_game, only: [:show, :update, :destroy, :give_options, :check_calzo, :check_dudo, :is_my_turn, :start_round, :end_round, :current_dices]
+    before_action :set_game, only: [:show, :update, :destroy, :give_options, :check_calzo, :check_dudo, :is_my_turn,
+                                    :start_round, :end_round, :current_dices, :end_turn]
     before_action :set_game_user, only: [:give_options, :end_round]
     before_action :set_actual_round, only: [:give_options, :check_calzo, :check_dudo, :end_round, :end_turn]
-
+    before_action :set_previous_turn, only: [:give_options]
     # GET /games
     def index
         @games = Game.all
@@ -37,7 +38,7 @@ class GamesController < ApplicationController
         quantity = params[:quantity]
         suit_id = params[:suit_id]
         user_id = params[:user_id]
-        Turn.create(suit_id: suit_id, quantity:quantity, user_id:user_id, round_id: @round.id)
+        Turn.create(suit_id: suit_id, quantity: quantity, user_id: user_id, round_id: @round.id)
         next_user_id = @game.next_player.id
         @game.notify_next_turn(next_user_id)
     end
@@ -48,14 +49,20 @@ class GamesController < ApplicationController
         user_action_id = params[:user_id]
         looked_quantity = params[:looked_quantity]
         looked_suit = params[:looked_suit]
+        status = nil
+        message = nil
         if action
+            puts "accion", action, "fin accion"
             if @game.check_calzo(looked_suit, looked_quantity)
                 @round.update(user_action_id: user_action_id, action: action, success: true)
                 @game.change_dice_quantity_from_hand(@round.id, user_action_id, 1)
+                status = true
+                message = "Bien Calzado"
             else
                 @round.update(user_action_id: user_action_id, action: action, success: false)
                 @game.change_dice_quantity_from_hand(@round.id, user_action_id, -1)
-
+                status = false
+                message = "Fallaste"
             end
         else
             if @game.check_dudo(looked_suit, looked_quantity)
@@ -63,16 +70,22 @@ class GamesController < ApplicationController
                 actual_player_position = GameUser.where(game_id: @game.id, user_id: user_action_id).first.position
                 to_remove_dice_player = @game.search_previous_alive_player(actual_player_position)
                 @game.change_dice_quantity_from_hand(@round.id, to_remove_dice_player.id, -1)
+                status = true
+                message = "Bien dudado"
+
             else
                 @round.update(user_action_id: user_action_id, action: action, success: true)
                 @game.change_dice_quantity_from_hand(@round.id, user_action_id, -1)
+                render json: {status: false, message:"Fallaste"}
+                status = false
+                message = "Fallaste"
             end
         end
         if @game.alive_players.length <= 1
             @game.update(finished: true)
         else
             @game.start_round
-
+            render json:{status:status, message:message}
         end
 
     end
@@ -144,7 +157,7 @@ class GamesController < ApplicationController
         dudo = false
         lower_limit_quantity = nil
         previous_suit = nil
-        if @previous_turn != nil
+        if !@previous_turn.nil?
             lower_limit_quantity = @previous_turn.quantity
             previous_suit = @previous_turn.suit_id
             if @previous_turn.suit_id >= 2
