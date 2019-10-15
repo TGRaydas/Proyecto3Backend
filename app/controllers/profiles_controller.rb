@@ -64,7 +64,16 @@ class ProfilesController < ApplicationController
             }
         rescue
             render json: {
-                state: "error"
+                state: "error",
+		total_games: "-",
+                won_games: "-",
+                percentage_won_games: "-",
+                average_final_position: "-",
+                most_frequent_play: {quantity: "-", suit: "multiple", frequency: "0"},
+                percentage_correct_dudos: "-",
+                percentage_correct_calzos: "-",
+                average_final_dices_won_games: "-",
+                percentage_special_moves: "-"
             }
         end
     end

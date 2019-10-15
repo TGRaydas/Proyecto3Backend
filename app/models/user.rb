@@ -94,9 +94,9 @@ end
   def most_frequent_play
     most_frequent_play = Turn.where(user_id: self.id).group(:quantity, :suit_id).count.sort_by{|pair, amount| amount}.last
     most_frequent_play_json = {
-        quantity: most_frequent_play[0][0],
-        suit: most_frequent_play[0][1],
-        frequency: most_frequent_play[1]
+      quantity: most_frequent_play[0][0],
+      suit: most_frequent_play[0][1],
+      frequency: most_frequent_play[1]
     }
     most_frequent_play_json
   end
