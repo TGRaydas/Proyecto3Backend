@@ -78,6 +78,11 @@ class ProfilesController < ApplicationController
         end
     end
 
+    def get_my_user_information
+        me = User.find(params[:user_id])
+        my_profile = Profile.where(user_id: params[:user_id]).first
+        render json: {email: me.email, nickname: my_profile.nickname}
+    end
 
     private
 

@@ -31,4 +31,5 @@ Rails.application.routes.draw do
     get '/games/:id/dices_in_round', to: "games#current_dices"
     post '/games/:id/end_round', to: "games#end_round"
     post '/games/:id/end_turn', to: "games#end_turn"
+    get '/my_user_information/:user_id', to: "profiles#get_my_user_information"
 end
