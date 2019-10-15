@@ -18,17 +18,20 @@ class GamesController < ApplicationController
     def start_game
         game = Game.find(params[:game_id])
         round = Round.create(game_id: game.id)
-        users = GameUser.where(game_id: game.id)
+        users = GameUser.where(game_id: game.id).where.not(position:nil)
         users.each do |user|
             hand = Hand.create(round_id: round.id, user_id: user.user_id, dice_quantity: 5)
             (0..4).each do |i|
                 Dice.create(hand_id: hand.id, suit_id: Suit.all.sample.id)
             end
-            client = Exponent::Push::Client.new
-            messages = [
-                {to: User.find(user.user_id).token, body: "Game started: " + game.name}
-            ]
-            client.publish messages
+            begin
+                client = Exponent::Push::Client.new
+                messages = [
+                    {to: User.find(user.user_id).token, body: "Game started: " + game.name}
+                ]
+                client.publish messages
+            rescue
+            end
         end
         render json: {started: true}
     end
@@ -39,55 +42,63 @@ class GamesController < ApplicationController
         suit_id = params[:suit_id]
         user_id = params[:user_id]
         Turn.create(suit_id: suit_id, quantity: quantity, user_id: user_id, round_id: @round.id)
-        next_user_id = @game.next_player.id
+        next_user_id = @game.next_player_turn_notification.id
+        puts "Siguiente jugador: #{User.find(next_user_id).email}"
         @game.notify_next_turn(next_user_id)
     end
 
 
     def end_round
-        action = params[:action]
+        puts "Entro a terminar la ronda"
+        action = params[:action_id]
+        puts "Accion #{action}"
         user_action_id = params[:user_id]
         looked_quantity = params[:looked_quantity]
-        looked_suit = params[:looked_suit]
+        looked_suit = params[:looked_suit].to_i
         status = nil
         message = nil
-        if action
+        if action == "calzo"
+            puts "entrando al calzo"
             puts "accion", action, "fin accion"
             if @game.check_calzo(looked_suit, looked_quantity)
-                @round.update(user_action_id: user_action_id, action: action, success: true)
+                @round.update(user_action_id: user_action_id, action: true, success: true)
                 @game.change_dice_quantity_from_hand(@round.id, user_action_id, 1)
                 status = true
                 message = "Bien Calzado"
+                puts "1"
             else
-                @round.update(user_action_id: user_action_id, action: action, success: false)
+                @round.update(user_action_id: user_action_id, action: true, success: false)
                 @game.change_dice_quantity_from_hand(@round.id, user_action_id, -1)
                 status = false
                 message = "Fallaste"
+                puts "2"
             end
-        else
+        elsif action == "dudo"
+            puts "Entre al dudo controlador"
             if @game.check_dudo(looked_suit, looked_quantity)
-                @round.update(user_action_id: user_action_id, action: action, success: true)
+                @round.update(user_action_id: user_action_id, action: false, success: true)
                 actual_player_position = GameUser.where(game_id: @game.id, user_id: user_action_id).first.position
                 to_remove_dice_player = @game.search_previous_alive_player(actual_player_position)
                 @game.change_dice_quantity_from_hand(@round.id, to_remove_dice_player.id, -1)
                 status = true
                 message = "Bien dudado"
+                puts "3"
 
             else
-                @round.update(user_action_id: user_action_id, action: action, success: true)
+                @round.update(user_action_id: user_action_id, action: false, success: true)
                 @game.change_dice_quantity_from_hand(@round.id, user_action_id, -1)
-                render json: {status: false, message:"Fallaste"}
+                render json: {status: false, message: "Fallaste"}
                 status = false
                 message = "Fallaste"
+                puts "4"
             end
         end
         if @game.alive_players.length <= 1
             @game.update(finished: true)
         else
             @game.start_round
-            render json:{status:status, message:message}
         end
-
+        render json: {status: status, message: message}
     end
 
     # POST /games
@@ -98,7 +109,7 @@ class GamesController < ApplicationController
             rules.each do |r|
                 GameRule.create(game_id: @game.id, rule_id: r[:id])
             end
-            GameUser.create(user_id: params[:user_id], game_id: @game.id, position: 1, final_place: nil)
+            GameUser.create(user_id: params[:user_id], game_id: @game.id, position: 1, final_place: nil, accepted: true)
             render json: @game, status: :created, location: @game
         else
             render json: @game.errors, status: :unprocessable_entity
@@ -115,7 +126,21 @@ class GamesController < ApplicationController
     end
 
     def is_my_turn
-        next_player = @game.next_player
+        rounds =@game.round.order(created_at: :desc)
+        next_player = nil
+        if rounds.length == 1 #Si el juego está en la primera ronda
+            if rounds.first.turns.length == 0 #Si estoy en la primera ronda y primer turno
+                next_player = @game.next_player_starting_game
+            else
+                next_player = @game.next_player_turn_notification
+            end
+        else
+            if rounds.first.turns.length == 0 #Si estoy en la ronda 2 o mas y primer turno
+                next_player = @game.next_player_second_round_start_notification
+            else
+                next_player = @game.next_player_turn_notification
+            end
+        end
         usuario = params[:user_id]
         if params[:user_id].to_i == next_player.id
             render json: {status: true, message: "Is your turn"}

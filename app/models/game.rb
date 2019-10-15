@@ -60,33 +60,68 @@ class Game < ApplicationRecord
         client.publish messages
     end
 
-    def next_player
+    def next_player_turn_notification
         game_rounds = Round.where(game_id: self.id).order(created_at: :desc)
-        if game_rounds.length == 1 # Si es la primera ronda
-            turns = Turn.where(round_id: game_rounds.first.id)
-            if turns.length == 0 #Si es el primer turno
-                player_with_first_position = GameUser.where(game_id: self.id, position: 1).first
-                return User.find(player_with_first_position.user_id)
-            end
-        end
         last_round = game_rounds.first
-        if last_round.finished? #Si la ronda pasada terminó
-            user_action_position = last_round.user_action_position
-            if last_round.calzo?
+        last_player_position = last_round.last_turn_user_position.position
+        puts "wea", last_player_position, "fin"
+        return search_next_alive_player(last_player_position)
+    end
+
+    def next_player_second_round_start_notification
+        last_round = Round.where(game_id: self.id).order(created_at: :desc).second
+        game_user = GameUser.where(game_id: self.id, user_id: last_round.user_action_id).first
+        if last_round.calzo?
+            return User.find(last_round.user_action_id)
+        elsif last_round.dudo?
+            if last_round.success
+                return self.search_previous_alive_player(game_user.position)
+            else
                 return User.find(last_round.user_action_id)
-            elsif last_round.dudo?
-                if last_round.success?
-                    return search_previous_alive_player(user_action_position)
-                else
-                    return User.find(last_round.user_action_id)
-                end
             end
-        else #Si la ronda no ha terminado
-            last_player_position = last_round.last_turn_user_position.position
-            puts "wea", last_player_position, "fin"
-            return search_next_alive_player(last_player_position)
         end
     end
+
+    def next_player_starting_game
+        player_with_first_position = GameUser.where(game_id: self.id, position: 1).first
+        return User.find(player_with_first_position.user_id)
+    end
+
+    #
+    # def next_player
+    #     game_rounds = Round.where(game_id: self.id).order(created_at: :desc)
+    #     if game_rounds.length == 1 # Si es la primera ronda
+    #         turns = Turn.where(round_id: game_rounds.first.id)
+    #         if turns.length == 0 #Si es el primer turno
+    #             player_with_first_position = GameUser.where(game_id: self.id, position: 1).first
+    #             return User.find(player_with_first_position.user_id)
+    #         end
+    #     end
+    #     last_round = game_rounds.first
+    #     if last_round.first_turn? #Si es el primer turno
+    #         if game_rounds.length == 1 #Si es el primer turno de la primera ronda
+    #             User.find(GameUser.where(game_id: self.id, position: 1))
+    #         else
+    #             last_round = game_rounds.second
+    #             user_action_position = last_round.user_action_position
+    #             if last_round.calzo?
+    #                 return User.find(last_round.user_action_id)
+    #             elsif last_round.dudo?
+    #                 if last_round.success?
+    #                     return search_previous_alive_player(user_action_position)
+    #                 else
+    #                     return User.find(last_round.user_action_id)
+    #                 end
+    #             end
+    #         end
+    #
+    #     else #Si la ronda no ha terminado
+    #         puts "Ronda actual:#{last_round.id}"
+    #         last_player_position = last_round.last_turn_user_position.position
+    #         puts "wea", last_player_position, "fin"
+    #         return search_next_alive_player(last_player_position)
+    #     end
+    # end
 
     def alive_players
         players = GameUser.where(game_id: self.id, final_place: nil)
@@ -107,7 +142,7 @@ class Game < ApplicationRecord
                 Dice.create(suit_id: rand(1..6), hand_id: hand.id)
             end
         end
-        next_user_id = self.next_player.id
+        next_user_id = self.next_player_second_round_start_notification
         self.notify_next_turn(next_user_id)
     end
 
@@ -129,16 +164,21 @@ class Game < ApplicationRecord
     end
 
     def check_dudo(looked_suit, looked_quantity)
-        suits = @game.current_dices
+        suits = self.current_dices
+        puts suits
         if looked_suit == 1
-            if suits[looked_suit] < doubt_quantity
+            puts "revisando ases"
+            if suits[looked_suit] < looked_quantity
                 return true
             end
         else
+            puts "Entre al else"
             if suits[looked_suit] + suits[1] < looked_quantity
+                puts "Entre donde tengo que entrar "
                 return true
             end
         end
+        puts "Retornando false"
         return false
     end
 
