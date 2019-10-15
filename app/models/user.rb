@@ -14,13 +14,16 @@ class User < ApplicationRecord
     hand.dice
   end
 
-  def my_accepted_games
+  def my_current_games
     games = GameUser.where(user_id: self.id).where.not(position: nil)
-    my_games = []
+    my_current_games = []
 	games.each do |g|
-		my_games.push(Game.find(g.game_id))
+      game = Game.find(g.game_id)
+      if !game.finished
+        my_current_games.push(game)
+      end
 	end  
-    return my_games	
+    return my_current_games
 end
   def get_my_friends(nickname)
     friends = []
@@ -47,10 +50,10 @@ end
     game_users = GameUser.where(user_id: self.id, position: nil)
     game_users.each do |gu|
       game = Game.find(gu[:game_id])
-      inviter = GameUser.where(game_id: game[:id], position: 1).first
-      if inviter.nil?
-        puts game.id
+      if game.finished
+        next
       end
+      inviter = GameUser.where(game_id: game[:id], position: 1).first
       profile = Profile.find_by_user_id(inviter[:user_id])
       invitations.push({game_user_inviter: inviter, profile:profile, game:game, game_user: gu})
     end

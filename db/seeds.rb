@@ -6,81 +6,83 @@
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
 
+
 def check_calzo(looked_quantity, looked_suit, dices)
-  suits = {1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0, 6 => 0}
-  # puts "suits 1: #{suits}"
-  # puts "suits[1]: #{suits[1]}"
-  dices.each do |d|
-    suits[d.suit.id] += 1
-  end
-  # puts "suits 2: #{suits}"
-  if looked_suit == 1
-    if suits[looked_suit] == looked_quantity
-      true
+    suits = {1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0, 6 => 0}
+    puts "suits 1: #{suits}"
+    puts "suits[1]: #{suits[1]}"
+    dices.each do |d|
+        suits[d.suit.id] += 1
     end
-  else
-    if suits[looked_suit] + suits[1] == looked_quantity
-      true
+    puts "suits 2: #{suits}"
+    if looked_suit == 1
+        if suits[looked_suit] == looked_quantity
+            true
+        end
+    else
+        if suits[looked_suit] + suits[1] == looked_quantity
+            true
+        end
     end
-  end
-  false
+    false
 end
 
 def check_dudo(doubt_quantity, doubt_suit, dices)
-  suits = {1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0, 6 => 0}
-  # puts "suits 1: #{suits}"
-  # puts "suits[1]: #{suits[1]}"
-  dices.each do |d|
-    suits[d.suit.id] += 1
-  end
-  # puts "suits 2: #{suits}"
-  if doubt_suit == 1
-    if suits[doubt_suit] < doubt_quantity
-      true
+    suits = {1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0, 6 => 0}
+    puts "suits 1: #{suits}"
+    puts "suits[1]: #{suits[1]}"
+    dices.each do |d|
+        suits[d.suit.id] += 1
     end
-  else
-    if suits[doubt_suit] + suits[1] < doubt_quantity
-      true
+    puts "suits 2: #{suits}"
+    if doubt_suit == 1
+        if suits[doubt_suit] < doubt_quantity
+            true
+        end
+    else
+        if suits[doubt_suit] + suits[1] < doubt_quantity
+            true
+        end
     end
-  end
-  false
+    false
 end
 
 def search_next_alive_player(current_position, players)
-  alive = true
-  while alive
-    if current_position < players.length
-      current_position += 1
-    elsif current_position == players.length
-      current_position = 1
+    alive = true
+    while alive
+        if current_position < players.length
+            current_position += 1
+        elsif current_position == players.length
+            current_position = 1
+        end
+        puts "players: #{players}, players.length: #{players.length}, players[0]: #{players[0]}"
+        possible_player = players.where(position:current_position).first
+        if possible_player.final_place == nil
+            alive = false
+            puts "search_next_alive_player return: #{User.find(possible_player.user_id).email}"
+            return User.find(possible_player.user_id)
+        end
     end
-    # puts "players: #{players}, players.length: #{players.length}, players[0]: #{players[0]}"
-    possible_player = players.where(position: current_position).first
-    if possible_player.final_place == nil
-      alive = false
-      # puts "search_next_alive_player return: #{User.find(possible_player.user_id).email}"
-      return User.find(possible_player.user_id)
-    end
-  end
 end
 
 def search_previous_alive_player(current_position, players)
-  alive = true
-  while alive
-    if current_position == 1
-      current_position = players.length
-    elsif current_position > 1
-      current_position -= 1
+    alive = true
+    while alive
+        if current_position == 1
+            current_position = players.length
+        elsif current_position > 1
+            current_position -= 1
+        end
+        puts "players: #{players}, players.length: #{players.length}, players[0]: #{players[0]}"
+        possible_player = players.where(position:current_position).first
+        if possible_player.final_place == nil
+            alive = false
+            puts "search_previous_alive_player return: #{User.find(possible_player.user_id).email}"
+            return User.find(possible_player.user_id)
+        end
     end
-    # puts "players: #{players}, players.length: #{players.length}, players[0]: #{players[0]}"
-    possible_player = players.where(position: current_position).first
-    if possible_player.final_place == nil
-      alive = false
-      # puts "search_previous_alive_player return: #{User.find(possible_player.user_id).email}"
-      return User.find(possible_player.user_id)
-    end
-  end
 end
+
 
 
 constants = {game_1: "GAME 1",
@@ -89,10 +91,21 @@ constants = {game_1: "GAME 1",
              description_picado: "Si un jugador posee dos ases, puede picar. Cuando un jugador pica, el sentido del juego cambia.
                                     El siguiente jugador solamente puede dudar el picado o seguir jugando.",
              description_paso: "Si un jugador posee 5 dados y todos estos son iguales, distintos o tiene un trio y un par, puede pasar.
-                                  Cuando un jugador pasa, le toca al siguiente jugador y este solamente puede seguir jugando o dudar el paso",
+                                  Cuando un jugador pasa, le toca al siguiente jugador y este solamente puede seguir juganddo o dudar el paso",
              description_cambio_as: "En cualquier momento un jugador puede cambiar la cantidad de dados a la mitad más uno de ases.\n Ej: Si tiene 7 cuadras puede decir 4 ases.\n
-                                        Si otro jugador desea volver a otra pinta, debe decir duplicar el número de dados. \n Ej: Si tiene 3 ases puede decir 7 de algo"
+                                        Si otro jugador desea volver a otra pinta, debe decir duplicar el numero de dados. \n Ej: Si tiene 3 ases puede decir 7 de algo "
 }
+Suit.create(name: "As")
+Suit.create(name: "Tontos")
+Suit.create(name: "Trenes")
+Suit.create(name: "Cuadras")
+Suit.create(name: "Quina")
+Suit.create(name: "Sexta")
+
+Rule.create(name: "Siciliana", description: constants["description_siciliana"])
+Rule.create(name: "Picado", description: constants["description_picado"])
+Rule.create(name: "Paso", description: constants["description_paso"])
+Rule.create(name: "Cambio a As", description: constants["description_cambio_as"])
 
 User.create(email: "pgrand@miuandes.cl", password: "password")
 User.create(email: "ijfigueroa@miuandes.cl", password: "password")
@@ -128,89 +141,12 @@ Friend.create(user_sender_id: 6, user_receiver_id: 2, state: 2)
 Friend.create(user_sender_id: 7, user_receiver_id: 5, state: 2)
 Friend.create(user_sender_id: 7, user_receiver_id: 4, state: 2)
 
-Rule.create(name: "Siciliana", description: constants["description_siciliana"])
-Rule.create(name: "Picado", description: constants["description_picado"])
-Rule.create(name: "Paso", description: constants["description_paso"])
-Rule.create(name: "Cambio a As", description: constants["description_cambio_as"])
-
-
-# Game.create!(name: constants["game_1"], finished: false)
-# GameRule.create!(rule_id: 4, game_id: 1)
-#
-# GameUser.create(user_id: 1, game_id: 1, position: 1, final_place: nil, accepted: true)
-# GameUser.create(user_id: 2, game_id: 1, position: 2, final_place: nil, accepted: true)
-# GameUser.create(user_id: 3, game_id: 1, position: 3, final_place: nil, accepted: true)
-#
-# Round.create(game_id: 1, user_action_id: 1, action: false, success: true)
-# Round.create(game_id: 1, user_action_id: 3, action: nil, success: nil)
-#
-# Hand.create(user_id: 1, round_id: 1)
-# Hand.create(user_id: 2, round_id: 1)
-# Hand.create(user_id: 3, round_id: 1)
-#
-#
-Suit.create(name: "As")
-Suit.create(name: "Tontos")
-Suit.create(name: "Trenes")
-Suit.create(name: "Cuadras")
-Suit.create(name: "Quina")
-Suit.create(name: "Sexta")
-#
-# Dice.create(hand_id: 1, suit_id: 1)
-# Dice.create(hand_id: 1, suit_id: 1)
-# Dice.create(hand_id: 1, suit_id: 3)
-# Dice.create(hand_id: 1, suit_id: 4)
-# Dice.create(hand_id: 1, suit_id: 5)
-#
-# Dice.create(hand_id: 2, suit_id: 1)
-# Dice.create(hand_id: 2, suit_id: 2)
-# Dice.create(hand_id: 2, suit_id: 3)
-# Dice.create(hand_id: 2, suit_id: 4)
-# Dice.create(hand_id: 2, suit_id: 5)
-#
-# Dice.create(hand_id: 3, suit_id: 3)
-# Dice.create(hand_id: 3, suit_id: 3)
-# Dice.create(hand_id: 3, suit_id: 2)
-# Dice.create(hand_id: 3, suit_id: 2)
-# Dice.create(hand_id: 3, suit_id: 2)
-#
-# Turn.create(round_id: 1, user_id: 1, rule_id: nil, suit_id: 4, quantity: 4)
-# Turn.create(round_id: 1, user_id: 2, rule_id: nil, suit_id: 6, quantity: 4)
-# Turn.create(round_id: 1, user_id: 3, rule_id: nil, suit_id: 6, quantity: 5)
-#
-# Hand.create(user_id: 1, round_id: 2)
-# Hand.create(user_id: 2, round_id: 2)
-# Hand.create(user_id: 3, round_id: 2)
-#
-# Dice.create(hand_id: 4, suit_id: 1)
-# Dice.create(hand_id: 4, suit_id: 1)
-# Dice.create(hand_id: 4, suit_id: 3)
-# Dice.create(hand_id: 4, suit_id: 3)
-# Dice.create(hand_id: 4, suit_id: 5)
-#
-# Dice.create(hand_id: 5, suit_id: 3)
-# Dice.create(hand_id: 5, suit_id: 2)
-# Dice.create(hand_id: 5, suit_id: 1)
-# Dice.create(hand_id: 5, suit_id: 1)
-# Dice.create(hand_id: 5, suit_id: 1)
-#
-# Dice.create(hand_id: 6, suit_id: 5)
-# Dice.create(hand_id: 6, suit_id: 5)
-# Dice.create(hand_id: 6, suit_id: 6)
-# Dice.create(hand_id: 6, suit_id: 4)
-#
-# Turn.create(round_id: 2, user_id: 1, rule_id: nil, suit_id: 4, quantity: 4)
-# Turn.create(round_id: 2, user_id: 2, rule_id: nil, suit_id: 6, quantity: 4)
-# Turn.create(round_id: 2, user_id: 3, rule_id: nil, suit_id: 6, quantity: 5)
-# Turn.create(round_id: 2, user_id: 1, rule_id: 4, suit_id: 1, quantity: 3)
-# Turn.create(round_id: 2, user_id: 2, rule_id: nil, suit_id: 1, quantity: 4)
-# Turn.create(round_id: 2, user_id: 3, rule_id: 4, suit_id: 6, quantity: 9)
 
 game_count = 0
 (1..10).each do |g|
   puts "Juego #{game_count}"
   game_count += 1
-  game = Game.create(name: "game #{g}", finished: false)
+  game = Game.create(name: "game #{g}", finished: false, startable:true)
   users = User.all
   owner = users[rand(0..users.length - 1)]
   GameUser.create(user_id: owner.id, game_id: game.id, position: 1, accepted: true, final_place: nil)
@@ -371,3 +307,5 @@ game_count = 0
     end
   end
 end
+
+
