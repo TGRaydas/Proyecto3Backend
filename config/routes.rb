@@ -32,4 +32,5 @@ Rails.application.routes.draw do
     post '/games/:id/end_round', to: "games#end_round"
     post '/games/:id/end_turn', to: "games#end_turn"
     get '/my_user_information/:user_id', to: "profiles#get_my_user_information"
+    get '/games/:id/chat', to: "games#chat"
 end

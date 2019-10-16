@@ -1,6 +1,6 @@
 class GamesController < ApplicationController
     before_action :set_game, only: [:show, :update, :destroy, :give_options, :check_calzo, :check_dudo, :is_my_turn,
-                                    :start_round, :end_round, :current_dices, :end_turn]
+                                    :start_round, :end_round, :current_dices, :end_turn, :chat]
     before_action :set_game_user, only: [:give_options, :end_round]
     before_action :set_actual_round, only: [:give_options, :check_calzo, :check_dudo, :end_round, :end_turn]
     before_action :set_previous_turn, only: [:give_options]
@@ -15,10 +15,34 @@ class GamesController < ApplicationController
         render json: @game
     end
 
+    def chat
+        final_obj = {status: true, items:[]}
+        @game.round.order(created_at: :asc).each do |round|
+            nickname = nil
+            action = nil
+            success = nil
+            if !round.user_action_id.nil?
+                nickname = Profile.where(user_id: round.user_action_id).first.nickname
+                if round.action
+                    action = "Calzo"
+                else
+                    action = "Dudo"
+                end
+                success = round.success
+            end
+            turns = []
+            round.turns.order(created_at: :asc).each do |t|
+                turns.push(suit_id: t.suit_id, quantity: t.quantity, nickname:Profile.where(user_id: t.user_id).first.nickname)
+            end
+            final_obj[:items].push(nickname:nickname, action:action, success:success, turns:turns)
+        end
+        render json: final_obj
+    end
+
     def start_game
         game = Game.find(params[:game_id])
         round = Round.create(game_id: game.id)
-        users = GameUser.where(game_id: game.id).where.not(position:nil)
+        users = GameUser.where(game_id: game.id).where.not(position: nil)
         users.each do |user|
             hand = Hand.create(round_id: round.id, user_id: user.user_id, dice_quantity: 5)
             (0..4).each do |i|
@@ -76,23 +100,24 @@ class GamesController < ApplicationController
         elsif action == "dudo"
             puts "Entre al dudo controlador"
             if @game.check_dudo(looked_suit, looked_quantity)
+                puts "BIEN DUDADO"
                 @round.update(user_action_id: user_action_id, action: false, success: true)
                 actual_player_position = GameUser.where(game_id: @game.id, user_id: user_action_id).first.position
                 to_remove_dice_player = @game.search_previous_alive_player(actual_player_position)
                 @game.change_dice_quantity_from_hand(@round.id, to_remove_dice_player.id, -1)
                 status = true
                 message = "Bien dudado"
-                puts "3"
 
             else
-                @round.update(user_action_id: user_action_id, action: false, success: true)
+                puts "MAL DUDADO"
+                @round.update(user_action_id: user_action_id, action: false, success: false)
                 @game.change_dice_quantity_from_hand(@round.id, user_action_id, -1)
-                render json: {status: false, message: "Fallaste"}
                 status = false
                 message = "Fallaste"
-                puts "4"
+
             end
         end
+        @game.set_final_positions
         if @game.alive_players.length <= 1
             @game.update(finished: true)
         else
@@ -126,7 +151,7 @@ class GamesController < ApplicationController
     end
 
     def is_my_turn
-        rounds =@game.round.order(created_at: :desc)
+        rounds = @game.round.order(created_at: :desc)
         next_player = nil
         if rounds.length == 1 #Si el juego está en la primera ronda
             if rounds.first.turns.length == 0 #Si estoy en la primera ronda y primer turno
@@ -142,10 +167,15 @@ class GamesController < ApplicationController
             end
         end
         usuario = params[:user_id]
+        finished_for_user = @game.game_finished_for_user(params[:user_id])
+        last_position = nil
+        if finished_for_user
+            last_position = GameUser.where(game_id: game_id, user_id: params[:user_id]).first.final_place
+        end
         if params[:user_id].to_i == next_player.id
-            render json: {status: true, message: "Is your turn"}
+            render json: {status: true, message: "Is your turn", final_place: last_position, finished_for_user: finished_for_user, game_finished: @game.finished}
         else
-            render json: {status: false, message: "Is not your turn"}
+            render json: {status: false, message: "Is not your turn", final_place: last_position, finished_for_user: finished_for_user, game_finished: @game.finished}
         end
     end
 
