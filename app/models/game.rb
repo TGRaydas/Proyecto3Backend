@@ -178,12 +178,16 @@ class Game < ApplicationRecord
     end
 
     def game_finished_for_user(user_id)
-        last_user_hand = self.round.order(created_at: :desc).first.hands.where(user_id: user_id).first
-        if last_user_hand.dice_quantity == 0
+        if self.round.order(created_at: :desc).first.hands.where(user_id: user_id).first.nil?
             true
-        else
-            false
         end
+
+        # last_user_hand = self.round.order(created_at: #:desc).first.hands.where(user_id: user_id).first
+        # #if last_user_hand.dice_quantity == 0
+        #     true
+        # #else
+        #     false
+        # #end
     end
 end
 

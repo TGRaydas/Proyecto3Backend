@@ -29,6 +29,8 @@ class GamesController < ApplicationController
                     action = "Dudo"
                 end
                 success = round.success
+                dices_return = []
+
             end
             turns = []
             round.turns.order(created_at: :asc).each do |t|
@@ -170,7 +172,8 @@ class GamesController < ApplicationController
         finished_for_user = @game.game_finished_for_user(params[:user_id])
         last_position = nil
         if finished_for_user
-            last_position = GameUser.where(game_id: game_id, user_id: params[:user_id]).first.final_place
+
+            last_position = GameUser.where(game_id: params[:id].to_i, user_id: params[:user_id].to_i).first.final_place
         end
         if params[:user_id].to_i == next_player.id
             render json: {status: true, message: "Is your turn", final_place: last_position, finished_for_user: finished_for_user, game_finished: @game.finished}
