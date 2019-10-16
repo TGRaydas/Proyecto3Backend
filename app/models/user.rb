@@ -13,7 +13,11 @@ class User < ApplicationRecord
         if !Game.find(game_id).game_finished_for_user(self.id).nil?
             actual_round = Round.where(game_id: game_id).order(created_at: :desc).first
             hand = Hand.where(user_id: self.id, round_id: actual_round.id).first
-            hand.dice
+            begin
+                hand.dice
+            rescue
+                []
+            end
         end
     end
 

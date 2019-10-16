@@ -6,8 +6,6 @@ class Game < ApplicationRecord
     has_many :users, through: :game_users
 
 
-
-
     def search_previous_alive_player(current_position)
         alive = true
         players = self.players
@@ -177,17 +175,25 @@ class Game < ApplicationRecord
         end
     end
 
-    def game_finished_for_user(user_id)
+    def game_finished_for_user_1(user_id)
         if self.round.order(created_at: :desc).first.hands.where(user_id: user_id).first.nil?
             true
         end
 
-        # last_user_hand = self.round.order(created_at: #:desc).first.hands.where(user_id: user_id).first
-        # #if last_user_hand.dice_quantity == 0
-        #     true
-        # #else
-        #     false
-        # #end
+
+    end
+
+    def game_finished_for_user(user_id)
+        last_user_hand = self.round.order(created_at: :desc).first.hands.where(user_id: user_id).first
+        begin
+            if last_user_hand.dice_quantity == 0
+                true
+            else
+                false
+            end
+        rescue
+            true
+        end
     end
 end
 

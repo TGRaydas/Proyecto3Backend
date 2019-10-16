@@ -169,7 +169,7 @@ class GamesController < ApplicationController
             end
         end
         usuario = params[:user_id]
-        finished_for_user = @game.game_finished_for_user(params[:user_id])
+        finished_for_user = @game.game_finished_for_user_1(params[:user_id])
         last_position = nil
         if finished_for_user
 
