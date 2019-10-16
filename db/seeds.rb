@@ -9,12 +9,12 @@
 
 def check_calzo(looked_quantity, looked_suit, dices)
     suits = {1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0, 6 => 0}
-    puts "suits 1: #{suits}"
-    puts "suits[1]: #{suits[1]}"
+    # puts "suits 1: #{suits}"
+    # puts "suits[1]: #{suits[1]}"
     dices.each do |d|
         suits[d.suit.id] += 1
     end
-    puts "suits 2: #{suits}"
+    # puts "suits 2: #{suits}"
     if looked_suit == 1
         if suits[looked_suit] == looked_quantity
             true
@@ -52,11 +52,11 @@ def search_next_alive_player(current_position, players)
         elsif current_position == players.length
             current_position = 1
         end
-        puts "players: #{players}, players.length: #{players.length}, players[0]: #{players[0]}"
+        # puts "players: #{players}, players.length: #{players.length}, players[0]: #{players[0]}"
         possible_player = players.where(position: current_position).first
         if possible_player.final_place == nil
             alive = false
-            puts "search_next_alive_player return: #{User.find(possible_player.user_id).email}"
+            # puts "search_next_alive_player return: #{User.find(possible_player.user_id).email}"
             return User.find(possible_player.user_id)
         end
     end
@@ -70,11 +70,11 @@ def search_previous_alive_player(current_position, players)
         elsif current_position > 1
             current_position -= 1
         end
-        puts "players: #{players}, players.length: #{players.length}, players[0]: #{players[0]}"
+        # puts "players: #{players}, players.length: #{players.length}, players[0]: #{players[0]}"
         possible_player = players.where(position: current_position).first
         if possible_player.final_place == nil
             alive = false
-            puts "search_previous_alive_player return: #{User.find(possible_player.user_id).email}"
+            # puts "search_previous_alive_player return: #{User.find(possible_player.user_id).email}"
             return User.find(possible_player.user_id)
         end
     end
@@ -140,7 +140,7 @@ Friend.create(user_sender_id: 7, user_receiver_id: 4, state: 2)
 
 game_count = 0
 (1..10).each do |g|
-    puts "Juego #{game_count}"
+    # puts "Juego #{game_count}"
     game_count += 1
     game = Game.create(name: "game #{g}", finished: false, startable: true)
     users = User.all
@@ -177,7 +177,7 @@ game_count = 0
     place = players.length
     round_count = 0
     while !game_finished
-        puts "\tRonda #{round_count}"
+        # puts "\tRonda #{round_count}"
         round = Round.create(game_id: game.id)
         players.each do |p| #Crear una mano para cada jugador
             prev_round = Round.where(game_id: game.id).order(created_at: :desc).second
@@ -204,17 +204,17 @@ game_count = 0
         round_count += 1
         turn_count = 0
         while !round_finished
-            puts "\t\tTurno #{turn_count}"
+            # puts "\t\tTurno #{turn_count}"
             turn_count += 1
-            # puts "current_position: #{current_position}"
-            puts "111"
+            # # puts "current_position: #{current_position}"
+            # puts "111"
             actual_player = User.find(players.where(position: current_position).first.user_id)
-            puts
+            # puts
             actual_hand = Hand.where(user_id: actual_player.id, round_id: round.id).first
             next_player = nil
             last_turn = Turn.where(round_id: round.id).order(created_at: :desc).first
             if last_turn != nil #Del turno 2 en adelante
-                # puts "current_position: #{current_position}"
+                # # puts "current_position: #{current_position}"
                 previous_player = search_previous_alive_player(current_position, players)
                 previous_player_hand = Hand.where(user_id: previous_player.id).first
                 probability = rand(1..10)
@@ -227,13 +227,13 @@ game_count = 0
                     success = false
                     new_dice_quantity = actual_hand.dice_quantity
                     if check_calzo(last_turn.quantity, last_turn.suit_id, dices)
-                        puts "BIEN CALZADO"
+                        # puts "BIEN CALZADO"
                         success = true
                         if actual_hand.dice_quantity <= 4
                             new_dice_quantity += 1
                         end
                     else
-                        puts "MAL CALZADO"
+                        # puts "MAL CALZADO"
                         new_dice_quantity -= 1
                     end
                     next_player = actual_player
@@ -241,10 +241,10 @@ game_count = 0
                     round.update(user_action_id: actual_player.id, success: success, action: action)
                     round_finished = true
                 elsif probability.between?(3, 7)
-                    puts"Juego"
+                    # puts"Juego"
                     #CONDICION DE SEGUIR LA PARTIDA
                     probability2 = 1
-                    # puts "last_turn.suit_id: #{last_turn.suit_id}, class of last_turn.suit_id: #{last_turn.suit_id.class}"
+                    # # puts "last_turn.suit_id: #{last_turn.suit_id}, class of last_turn.suit_id: #{last_turn.suit_id.class}"
                     if last_turn.suit_id == 6
                         probability2 = rand(3..4)
                     elsif last_turn.suit_id == 1
@@ -277,19 +277,19 @@ game_count = 0
                     success = false
                     actual_dice_quantity = actual_hand.dice_quantity
                     if check_dudo(last_turn.quantity, last_turn.suit_id, dices)
-                        puts "BIEN DUDADO"
+                        # puts "BIEN DUDADO"
                         success = true
                         previous_player_hand.update(dice_quantity: previous_player_hand.dice_quantity - 1)
                         next_player = previous_player
                     else
-                        puts "MAL DUDADO"
+                        # puts "MAL DUDADO"
                         actual_hand.update(dice_quantity: actual_dice_quantity - 1)
                         next_player = actual_player
                     end
                     round.update(user_action_id: actual_player.id, success: success, action: action)
                     round_finished = true
                 end
-                # puts "next_player: #{next_player.email}"
+                # # puts "next_player: #{next_player.email}"
                 if hands.where(user_id: next_player.id).first.dice_quantity <= 0 #Si un jugador se quedo sin dados
                     players.where(user_id: next_player.id).first.update(final_place: place)
                     place -= 1
@@ -303,7 +303,7 @@ game_count = 0
                 Turn.create(suit_id: rand(1..6), round_id: round.id, user_id: actual_player.id, quantity: rand(1..actual_dice_quantity / 2))
                 next_player = search_next_alive_player(current_position, players)
             end
-            # puts "next_player: #{next_player.email}"
+            # # puts "next_player: #{next_player.email}"
             current_position = GameUser.where(game_id: game.id, user_id: next_player.id).first.position
         end
     end
