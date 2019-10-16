@@ -32,7 +32,7 @@ class GamesController < ApplicationController
             end
             turns = []
             round.turns.order(created_at: :asc).each do |t|
-                turns.push(suit_id: t.suit_id, quantity: t.quantity, nickname:Profile.where(user_id: t.user_id).first.nickname)
+                turns.push(suit_id: Suit.find(t.suit_id).name, quantity: t.quantity, nickname:Profile.where(user_id: t.user_id).first.nickname)
             end
             final_obj[:items].push(nickname:nickname, action:action, success:success, turns:turns)
         end
